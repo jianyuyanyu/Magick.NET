@@ -15,6 +15,8 @@ namespace Magick.NET.Tests
             {
 #if PLATFORM_AnyCPU
                 Assert.Contains("AnyCPU", MagickNET.Version);
+#elif PLATFORM_arm64
+                Assert.Contains("arm64", MagickNET.Version);
 #elif PLATFORM_x64
                 Assert.Contains("x64", MagickNET.Version);
 #else
