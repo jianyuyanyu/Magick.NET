@@ -28,7 +28,7 @@ namespace Magick.NET.Tests
                 var formatsCount = MagickNET.SupportedFormats.Count();
 
                 if (OperatingSystem.IsWindows)
-#if Platform_arm64
+#if PLATFORM_arm64
                     Assert.Equal(263, formatsCount);
 #else
                     Assert.Equal(264, formatsCount);
