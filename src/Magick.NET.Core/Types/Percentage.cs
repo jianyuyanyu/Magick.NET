@@ -9,35 +9,39 @@ namespace ImageMagick;
 /// <summary>
 /// Represents a percentage value.
 /// </summary>
-public struct Percentage : IEquatable<Percentage>, IComparable<Percentage>
+public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percentage>
 {
     private readonly double _value;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Percentage"/> struct.
     /// </summary>
-    /// <param name="value">The value (0% = 0.0, 100% = 100.0).</param>
+    /// <param name="value">The value (0% = 0.0, 100% = 100.0, 142.42% = 142.42). Negative percentages are allow but are not supported by all methods.</param>
     public Percentage(double value)
-        => _value = value;
+    {
+        _value = value;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Percentage"/> struct.
     /// </summary>
-    /// <param name="value">The value (0% = 0, 100% = 100).</param>
+    /// <param name="value">The value (0% = 0, 100% = 100, 142% = 142). Negative percentages are allow but are not supported by all methods.</param>
     public Percentage(int value)
-        => _value = value;
+    {
+        _value = value;
+    }
 
     /// <summary>
     /// Converts the specified double to an instance of this type.
     /// </summary>
-    /// <param name="value">The value (0% = 0, 100% = 100).</param>
+    /// <param name="value">The value (0% = 0.0, 100% = 100.0, 142.42% = 142.42). Negative percentages are allow but are not supported by all methods.</param>
     public static explicit operator Percentage(double value)
         => new Percentage(value);
 
     /// <summary>
     /// Converts the specified int to an instance of this type.
     /// </summary>
-    /// <param name="value">The value (0% = 0, 100% = 100).</param>
+    /// <param name="value">The value (0% = 0, 100% = 100, 142% = 142). Negative percentages are allow but are not supported by all methods.</param>
     public static explicit operator Percentage(int value)
         => new Percentage(value);
 
@@ -52,8 +56,8 @@ public struct Percentage : IEquatable<Percentage>, IComparable<Percentage>
     /// Converts the <see cref="Percentage"/> to a quantum type.
     /// </summary>
     /// <param name="percentage">The <see cref="Percentage"/> to convert.</param>
-    public static explicit operator int(Percentage percentage)
-        => percentage.ToInt32();
+    public static explicit operator uint(Percentage percentage)
+        => percentage.ToUInt32();
 
     /// <summary>
     /// Determines whether the specified <see cref="Percentage"/> instances are considered equal.
@@ -165,18 +169,18 @@ public struct Percentage : IEquatable<Percentage>, IComparable<Percentage>
         => _value.GetHashCode();
 
     /// <summary>
-    /// Multiplies the value by the percentage.
+    /// Multiplies the value by the specified percentage.
     /// </summary>
     /// <param name="value">The value to use.</param>
-    /// <returns>the new value.</returns>
+    /// <returns>The new value.</returns>
     public double Multiply(double value)
         => (value * _value) / 100.0;
 
     /// <summary>
-    /// Multiplies the value by the percentage.
+    /// Multiplies the value by the specified percentage.
     /// </summary>
     /// <param name="value">The value to use.</param>
-    /// <returns>the new value.</returns>
+    /// <returns>The new value.</returns>
     public int Multiply(int value)
         => (int)((value * _value) / 100.0);
 
@@ -193,6 +197,13 @@ public struct Percentage : IEquatable<Percentage>, IComparable<Percentage>
     /// <returns>An integer that represents the current percentage.</returns>
     public int ToInt32()
         => (int)Math.Round(_value, MidpointRounding.AwayFromZero);
+
+    /// <summary>
+    /// Returns an integer that represents the current percentage.
+    /// </summary>
+    /// <returns>An integer that represents the current percentage.</returns>
+    public uint ToUInt32()
+        => (uint)Math.Round(_value, MidpointRounding.AwayFromZero);
 
     /// <summary>
     /// Returns a string that represents the current percentage.

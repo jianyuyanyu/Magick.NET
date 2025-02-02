@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using ImageMagick;
 using Xunit;
 
@@ -10,6 +11,30 @@ public partial class MagickImageTests
 {
     public class TheModulateMethod
     {
+        [Fact]
+        public void ShouldThrowExceptionWhenBrightnessIsNegative()
+        {
+            using var image = new MagickImage();
+
+            Assert.Throws<ArgumentException>("brightness", () => image.Modulate(new Percentage(-1)));
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenSaturationIsNegative()
+        {
+            using var image = new MagickImage();
+
+            Assert.Throws<ArgumentException>("saturation", () => image.Modulate(new Percentage(0), new Percentage(-1)));
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenHueIsNegative()
+        {
+            using var image = new MagickImage();
+
+            Assert.Throws<ArgumentException>("hue", () => image.Modulate(new Percentage(0), new Percentage(0), new Percentage(-1)));
+        }
+
         [Fact]
         public void ShouldDefaultTo100PercentForSaturationAndHue()
         {
@@ -50,12 +75,12 @@ public partial class MagickImageTests
             ColorAssert.Equal(new MagickColor("#3e3e74"), image, 125, 70);
             ColorAssert.Equal(new MagickColor("#a8a8a8"), image, 125, 40);
 #else
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#72803da83da8", "#747a3eb83eb8")), image, 25, 70);
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#0b2d0b2d0b2d", "#0b5f0b5f0b5f")), image, 25, 40);
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#1ef3397a1ef3", "#1f7c3a781f7c")), image, 75, 70);
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#592d592d592d", "#5ab75ab75ab7")), image, 75, 40);
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#3da83da87280", "#3eb83eb8747a")), image, 125, 70);
-            ColorAssert.Equal(new MagickColor(OpenCLValue.Get("#a5aea5aea5ae", "#a88ba88ba88b")), image, 125, 40);
+            ColorAssert.Equal(new MagickColor("#747a3eb83eb8"), image, 25, 70);
+            ColorAssert.Equal(new MagickColor("#0b5f0b5f0b5f"), image, 25, 40);
+            ColorAssert.Equal(new MagickColor("#1f7c3a781f7c"), image, 75, 70);
+            ColorAssert.Equal(new MagickColor("#5ab75ab75ab7"), image, 75, 40);
+            ColorAssert.Equal(new MagickColor("#3eb83eb8747a"), image, 125, 70);
+            ColorAssert.Equal(new MagickColor("#a88ba88ba88b"), image, 125, 40);
 #endif
         }
     }

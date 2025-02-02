@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Factories;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -15,7 +16,7 @@ public partial class SettingsFactoryTests
         {
             var factory = new SettingsFactory();
 
-            var settings = factory.CreateComplexSettings();
+            var settings = factory.CreateComplexSettings(ComplexOperator.MagnitudePhase);
 
             Assert.NotNull(settings);
             Assert.IsType<ComplexSettings>(settings);

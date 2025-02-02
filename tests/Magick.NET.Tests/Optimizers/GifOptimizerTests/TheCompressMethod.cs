@@ -12,37 +12,40 @@ public partial class GifOptimizerTests
 {
     public class TheCompressMethod : GifOptimizerTests
     {
-        [Fact]
-        public void ShouldCompress()
+        public class WithFileInfoFileNameOrStream : TheCompressMethod
         {
-            var result = AssertCompressSmaller(Files.FujiFilmFinePixS1ProGIF);
-            Assert.Equal(172861, result);
+            [Fact]
+            public void ShouldCompress()
+            {
+                var result = AssertCompressSmaller(Files.FujiFilmFinePixS1ProGIF);
+                Assert.Equal(172861, result);
+            }
+
+            [Fact]
+            public void ShouldTryToCompress()
+                => AssertCompressNotSmaller(Files.RoseSparkleGIF);
+
+            [Fact]
+            public void ShouldBeAbleToCompressFileTwoTimes()
+                => AssertCompressTwice(Files.FujiFilmFinePixS1ProGIF);
+
+            [Fact]
+            public void ShouldThrowExceptionWhenFileFormatIsInvalid()
+                => AssertCompressInvalidFileFormat(Files.ImageMagickJPG);
         }
-
-        [Fact]
-        public void ShouldTryToCompress()
-            => AssertCompressNotSmaller(Files.RoseSparkleGIF);
-
-        [Fact]
-        public void ShouldBeAbleToCompressFileTwoTimes()
-            => AssertCompressTwice(Files.FujiFilmFinePixS1ProGIF);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenFileFormatIsInvalid()
-            => AssertCompressInvalidFileFormat(Files.ImageMagickJPG);
 
         public class WithFileInfo : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileIsNull()
-                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null));
+                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null!));
         }
 
         public class WithFileName : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsNull()
-                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null));
+                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsEmpty()
@@ -57,11 +60,11 @@ public partial class GifOptimizerTests
             }
         }
 
-        public class WithStreamName : TheCompressMethod
+        public class WithStream : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNull()
-                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null));
+                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNotReadable()

@@ -16,7 +16,7 @@ public partial class MagickImageTests
         {
             using var image = new MagickImage();
 
-            Assert.Throws<ArgumentNullException>("color", () => image.InverseTransparent(null));
+            Assert.Throws<ArgumentNullException>("color", () => image.InverseTransparent(null!));
         }
 
         [Fact]
@@ -33,7 +33,7 @@ public partial class MagickImageTests
             image.InverseTransparent(red);
 
             ColorAssert.NotEqual(transparentRed, image, 0, 0);
-            ColorAssert.Equal(transparentRed, image, image.Width - 1, 0);
+            ColorAssert.Equal(transparentRed, image, (int)image.Width - 1, 0);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace ImageMagick;
 
 internal sealed partial class MagickRectangle
 {
-    public MagickRectangle(int x, int y, int width, int height)
+    public MagickRectangle(int x, int y, uint width, uint height)
     {
         X = x;
         Y = y;
@@ -17,15 +17,15 @@ internal sealed partial class MagickRectangle
 
     private MagickRectangle(NativeMagickRectangle instance)
     {
-        X = instance.X;
-        Y = instance.Y;
-        Width = instance.Width;
-        Height = instance.Height;
+        X = (int)instance.X_Get();
+        Y = (int)instance.Y_Get();
+        Width = (uint)instance.Width_Get();
+        Height = (uint)instance.Height_Get();
     }
 
-    public int Height { get; set; }
+    public uint Height { get; set; }
 
-    public int Width { get; set; }
+    public uint Width { get; set; }
 
     public int X { get; set; }
 
@@ -35,23 +35,26 @@ internal sealed partial class MagickRectangle
         => NativeMagickRectangle.FromPageSize(pageSize);
 
     public static MagickRectangle FromGeometry(IMagickGeometry geometry, MagickImage image)
+        => FromGeometry(geometry, image.Width, image.Height);
+
+    public static MagickRectangle FromGeometry(IMagickGeometry geometry, uint imageWidth, uint imageHeight)
     {
-        Throw.IfNull(nameof(geometry), geometry);
+        Throw.IfNull(geometry);
 
         var width = geometry.Width;
         var height = geometry.Height;
 
         if (geometry.IsPercentage)
         {
-            width = image.Width * new Percentage(geometry.Width);
-            height = image.Height * new Percentage(geometry.Height);
+            width = (uint)(imageWidth * new Percentage(geometry.Width));
+            height = (uint)(imageHeight * new Percentage(geometry.Height));
         }
 
         return new MagickRectangle(geometry.X, geometry.Y, width, height);
     }
 
     internal static INativeInstance CreateInstance()
-        => new NativeMagickRectangle();
+        => NativeMagickRectangle.Create();
 
     internal static MagickRectangle CreateInstance(INativeInstance nativeInstance)
     {
@@ -60,13 +63,4 @@ internal sealed partial class MagickRectangle
 
         return new MagickRectangle(instance);
     }
-
-    private NativeMagickRectangle CreateNativeInstance()
-        => new NativeMagickRectangle
-        {
-            X = X,
-            Y = Y,
-            Width = Width,
-            Height = Height,
-        };
 }

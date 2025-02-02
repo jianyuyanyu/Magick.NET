@@ -8,7 +8,7 @@ namespace ImageMagick;
 /// <summary>
 /// Interface that describes an image profile.
 /// </summary>
-public interface IImageProfile : IEquatable<IImageProfile?>
+public partial interface IImageProfile : IEquatable<IImageProfile?>
 {
     /// <summary>
     /// Gets the name of the profile.
@@ -16,14 +16,8 @@ public interface IImageProfile : IEquatable<IImageProfile?>
     string Name { get; }
 
     /// <summary>
-    /// Returns the <see cref="byte"/> array of this profile.
-    /// </summary>
-    /// <returns>A <see cref="byte"/> array.</returns>
-    byte[]? GetData();
-
-    /// <summary>
     /// Converts this instance to a byte array.
     /// </summary>
     /// <returns>A <see cref="byte"/> array.</returns>
-    byte[]? ToByteArray();
+    byte[] ToByteArray();
 }

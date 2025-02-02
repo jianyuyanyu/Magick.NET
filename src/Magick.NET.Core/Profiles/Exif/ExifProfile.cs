@@ -59,7 +59,7 @@ public sealed class ExifProfile : ImageProfile, IExifProfile
     /// <summary>
     /// Gets the tags that where found but contained an invalid value.
     /// </summary>
-    public IReadOnlyCollection<ExifTag> InvalidTags
+    public IReadOnlyList<ExifTag> InvalidTags
     {
         get
         {
@@ -71,31 +71,31 @@ public sealed class ExifProfile : ImageProfile, IExifProfile
     /// <summary>
     /// Gets the length of the thumbnail data in the <see cref="byte"/> array of the profile.
     /// </summary>
-    public int ThumbnailLength
+    public uint ThumbnailLength
     {
         get
         {
             InitializeValues();
-            return (int)_data.ThumbnailLength;
+            return _data.ThumbnailLength;
         }
     }
 
     /// <summary>
     /// Gets the offset of the thumbnail data in the <see cref="byte"/> array of the profile.
     /// </summary>
-    public int ThumbnailOffset
+    public uint ThumbnailOffset
     {
         get
         {
             InitializeValues();
-            return (int)_data.ThumbnailOffset;
+            return _data.ThumbnailOffset;
         }
     }
 
     /// <summary>
     /// Gets the values of this exif profile.
     /// </summary>
-    public IReadOnlyCollection<IExifValue> Values
+    public IReadOnlyList<IExifValue> Values
     {
         get
         {
@@ -173,7 +173,7 @@ public sealed class ExifProfile : ImageProfile, IExifProfile
     /// <typeparam name="TValueType">The data type of the tag.</typeparam>
     public void SetValue<TValueType>(ExifTag<TValueType> tag, TValueType value)
     {
-        Throw.IfNull(nameof(value), value);
+        Throw.IfNull(value);
 
         InitializeValues();
         foreach (var exifValue in _data.Values)

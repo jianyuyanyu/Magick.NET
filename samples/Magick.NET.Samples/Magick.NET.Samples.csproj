@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard20</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputPath>bin\$(Configuration)\$(Platform)\</OutputPath>
     <Authors>Dirk Lemstra</Authors>
     <Copyright>Copyright 2013-2022 Dirk Lemstra</Copyright>
@@ -17,4 +17,5 @@
     <ProjectReference Include="..\..\src\Magick.NET\Magick.NET.csproj" />
   </ItemGroup>
 
+  <Import Project="../Magick.props" />
 </Project>

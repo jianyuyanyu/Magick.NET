@@ -16,8 +16,8 @@ public partial class MagickImageTests
             using var image = new MagickImage(Files.Builtin.Logo);
             image.Shave(10);
 
-            Assert.Equal(620, image.Width);
-            Assert.Equal(460, image.Height);
+            Assert.Equal(620U, image.Width);
+            Assert.Equal(460U, image.Height);
         }
 
         [Fact]
@@ -26,8 +26,8 @@ public partial class MagickImageTests
             using var image = new MagickImage(Files.Builtin.Logo);
             image.Shave(20, 40);
 
-            Assert.Equal(600, image.Width);
-            Assert.Equal(400, image.Height);
+            Assert.Equal(600U, image.Width);
+            Assert.Equal(400U, image.Height);
         }
     }
 }

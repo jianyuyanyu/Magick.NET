@@ -36,12 +36,12 @@ public partial class SafePixelCollectionTests
         public void ShouldReturnEnumeratorForFirst()
         {
             using var image = new MagickImage(Files.ConnectedComponentsPNG, 10, 10);
-            var pixel = image.GetPixels().First(p => p.ToColor().Equals(MagickColors.Black));
+            var pixel = image.GetPixels().FirstOrDefault(p => p.ToColor()?.Equals(MagickColors.Black) ?? false);
 
             Assert.NotNull(pixel);
             Assert.Equal(350, pixel.X);
             Assert.Equal(196, pixel.Y);
-            Assert.Equal(2, pixel.Channels);
+            Assert.Equal(2U, pixel.Channels);
         }
 
         [Fact]

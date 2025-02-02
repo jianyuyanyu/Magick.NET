@@ -4,16 +4,16 @@
 namespace ImageMagick;
 
 /// <summary>
-/// Contains the he perceptual hash of one or more image channels.
+/// Contains the perceptual hash of one or more image channels.
 /// </summary>
 public interface IPerceptualHash
 {
     /// <summary>
     /// Returns the perceptual hash for the specified channel.
     /// </summary>
-    /// <param name="channel">The channel to get the has for.</param>
+    /// <param name="channel">The channel to get the hash for.</param>
     /// <returns>The perceptual hash for the specified channel.</returns>
-    IChannelPerceptualHash GetChannel(PixelChannel channel);
+    IChannelPerceptualHash? GetChannel(PixelChannel channel);
 
     /// <summary>
     /// Returns the sum squared difference between this hash and the other hash.

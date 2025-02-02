@@ -3,6 +3,7 @@
 
 using System;
 using ImageMagick;
+using ImageMagick.Factories;
 using Xunit;
 
 #if Q8
@@ -28,7 +29,7 @@ public partial class MagickColorFactoryTests
 
             Assert.Throws<ArgumentNullException>("color", () =>
             {
-                factory.Create((string)null);
+                factory.Create((string)null!);
             });
         }
 

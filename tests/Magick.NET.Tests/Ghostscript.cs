@@ -22,14 +22,14 @@ public static class Ghostscript
             MagickNET.SetGhostscriptDirectory(directory);
     }
 
-    private static string GetGhostscriptDirectory()
+    private static string? GetGhostscriptDirectory()
     {
         if (!Runtime.IsWindows)
             return null;
 
         foreach (var version in new[] { "10.01.1", "10.00.1" })
         {
-            var directory = @$"C:\Program Files (x86)\gs\gs${version}\bin";
+            var directory = @$"C:\Program Files (x86)\gs\gs{version}\bin";
             if (Directory.Exists(directory))
                 return directory;
         }

@@ -1,14 +1,14 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
 
-public partial class ColorHSVTests
+public partial class ColorYUVTests
 {
-    public class ColorYUVTests
+    public class TheEqualsMethod
     {
         [Fact]
         public void ShouldReturnFalseWhenOtherIsNull()
@@ -23,7 +23,7 @@ public partial class ColorHSVTests
         {
             var color = new ColorYUV(1, 1, 1);
 
-            Assert.False(color.Equals((object)null));
+            Assert.False(color.Equals((object?)null));
         }
 
         [Fact]

@@ -13,30 +13,33 @@ public partial class PngOptimizerTests
 {
     public class TheLosslessCompressMethod : PngOptimizerTests
     {
-        [Fact]
-        public void ShouldCompressLossless()
+        public class WithFileInfoFileNameOrStream : TheLosslessCompressMethod
         {
-            var result = AssertLosslessCompressSmaller(Files.SnakewarePNG);
-            Assert.Equal(8684, result);
+            [Fact]
+            public void ShouldCompressLossless()
+            {
+                var result = AssertLosslessCompressSmaller(Files.SnakewarePNG);
+                Assert.Equal(8684, result);
+            }
+
+            [Fact]
+            public void ShouldTryToCompressLossLess()
+                => AssertLosslessCompressNotSmaller(Files.MagickNETIconPNG);
+
+            [Fact]
+            public void ShouldBeAbleToCompressFileTwoTimes()
+                => AssertLosslessCompressTwice(Files.SnakewarePNG);
+
+            [Fact]
+            public void ShouldThrowExceptionWhenFileFormatIsInvalid()
+                => AssertLosslessCompressInvalidFileFormat(Files.ImageMagickJPG);
         }
-
-        [Fact]
-        public void ShouldTryToCompressLossLess()
-            => AssertLosslessCompressNotSmaller(Files.MagickNETIconPNG);
-
-        [Fact]
-        public void ShouldBeAbleToCompressFileTwoTimes()
-            => AssertLosslessCompressTwice(Files.SnakewarePNG);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenFileFormatIsInvalid()
-            => AssertLosslessCompressInvalidFileFormat(Files.ImageMagickJPG);
 
         public class WithFileInfo : TheLosslessCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileIsNull()
-                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.LosslessCompress((FileInfo)null));
+                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.LosslessCompress((FileInfo)null!));
 
             [Fact]
             public void ShouldNotOptimizeAnimatedPNG()
@@ -53,7 +56,7 @@ public partial class PngOptimizerTests
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsNull()
-                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.LosslessCompress((string)null));
+                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.LosslessCompress((string)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsEmpty()
@@ -67,11 +70,11 @@ public partial class PngOptimizerTests
             }
         }
 
-        public class WithStreamName : TheLosslessCompressMethod
+        public class WithStream : TheLosslessCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNull()
-                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.LosslessCompress((Stream)null));
+                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.LosslessCompress((Stream)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNotReadable()

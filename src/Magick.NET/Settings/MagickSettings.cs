@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using ImageMagick.Drawing;
 
 #if Q8
 using QuantumType = System.Byte;
@@ -23,30 +24,28 @@ namespace ImageMagick;
 /// </summary>
 public partial class MagickSettings : IMagickSettings<QuantumType>
 {
-    private readonly Dictionary<string, string?> _options = new Dictionary<string, string?>();
+    private readonly Dictionary<string, string?> _options = new();
 
-    private string? _font;
     private double _fontPointsize;
 
     internal MagickSettings()
     {
-        using var instance = new NativeMagickSettings();
-        AntiAlias = instance.AntiAlias;
-        BackgroundColor = instance.BackgroundColor;
-        ColorSpace = instance.ColorSpace;
-        ColorType = instance.ColorType;
-        Compression = instance.Compression;
-        Debug = instance.Debug;
-        Density = CreateDensity(instance.Density);
-        Depth = instance.Depth;
-        Endian = instance.Endian;
-        Extract = MagickGeometry.FromString(instance.Extract);
-        _font = instance.Font;
-        _fontPointsize = instance.FontPointsize;
-        Format = EnumHelper.Parse(instance.Format, MagickFormat.Unknown);
-        Interlace = instance.Interlace;
-        Monochrome = instance.Monochrome;
-        Verbose = instance.Verbose;
+        using var instance = NativeMagickSettings.Create();
+        AntiAlias = instance.AntiAlias_Get();
+        BackgroundColor = instance.BackgroundColor_Get();
+        ColorSpace = instance.ColorSpace_Get();
+        ColorType = instance.ColorType_Get();
+        Compression = instance.Compression_Get();
+        Debug = instance.Debug_Get();
+        Density = CreateDensity(instance.Density_Get());
+        Depth = (uint)instance.Depth_Get();
+        Endian = instance.Endian_Get();
+        Extract = MagickGeometry.FromString(instance.Extract_Get());
+        _fontPointsize = instance.FontPointsize_Get();
+        Format = EnumHelper.Parse(instance.Format_Get(), MagickFormat.Unknown);
+        Interlace = instance.Interlace_Get();
+        Monochrome = instance.Monochrome_Get();
+        Verbose = instance.Verbose_Get();
         Drawing = new DrawingSettings();
     }
 
@@ -108,7 +107,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <summary>
     /// Gets or sets the depth (bits allocated to red/green/blue components).
     /// </summary>
-    public int Depth { get; set; }
+    public uint Depth { get; set; }
 
     /// <summary>
     /// Gets or sets the endianness (little like Intel or big like SPARC) for image formats which support
@@ -152,10 +151,9 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// </summary>
     public string? Font
     {
-        get => _font;
+        get => Drawing.Font;
         set
         {
-            _font = value;
             Drawing.Font = value;
         }
     }
@@ -165,7 +163,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// </summary>
     public string? FontFamily
     {
-        get => GetOption("family");
+        get => Drawing.FontFamily;
         set
         {
             SetOptionAndArtifact("family", value);
@@ -191,7 +189,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// </summary>
     public FontStyleType FontStyle
     {
-        get => EnumHelper.Parse(GetOption("style"), FontStyleType.Undefined);
+        get => Drawing.FontStyle;
         set
         {
             SetOptionAndArtifact("style", value);
@@ -204,18 +202,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// </summary>
     public FontWeight FontWeight
     {
-        get
-        {
-            var weight = GetOption("weight");
-            if (string.IsNullOrEmpty(weight))
-                return FontWeight.Undefined;
-
-            if (!int.TryParse(weight, NumberStyles.Number, CultureInfo.InvariantCulture, out var fontweight))
-                return FontWeight.Undefined;
-
-            return EnumHelper.Parse(fontweight, FontWeight.Undefined);
-        }
-
+        get => Drawing.FontWeight;
         set
         {
             SetOptionAndArtifact("weight", ((int)value).ToString(CultureInfo.InvariantCulture));
@@ -227,6 +214,11 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// Gets or sets the the format of the image.
     /// </summary>
     public MagickFormat Format { get; set; }
+
+    /// <summary>
+    /// Gets or sets the interlace method.
+    /// </summary>
+    public Interlace Interlace { get; set; }
 
     /// <summary>
     /// Gets or sets the preferred size and location of an image canvas.
@@ -302,7 +294,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// of the line stroking the path. The miterLimit' imposes a limit on the ratio of the miter
     /// length to the 'lineWidth'. The default value is 4.
     /// </summary>
-    public int StrokeMiterLimit
+    public uint StrokeMiterLimit
     {
         get => Drawing.StrokeMiterLimit;
         set => Drawing.StrokeMiterLimit = value;
@@ -433,11 +425,9 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
 
     internal string? FileName { get; set; }
 
-    internal Interlace Interlace { get; set; }
-
     internal bool Ping { get; set; }
 
-    internal int Quality { get; set; }
+    internal uint Quality { get; set; }
 
     /// <summary>
     /// Gets or sets the specified area to extract from the image.
@@ -447,7 +437,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <summary>
     /// Gets or sets the number of scenes.
     /// </summary>
-    protected int NumberScenes { get; set; }
+    protected uint NumberScenes { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether a monochrome reader should be used.
@@ -462,7 +452,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <summary>
     /// Gets or sets the active scene.
     /// </summary>
-    protected int Scene { get; set; }
+    protected uint Scene { get; set; }
 
     /// <summary>
     /// Gets or sets scenes of the image.
@@ -477,7 +467,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <returns>The value of a format-specific option.</returns>
     public string? GetDefine(MagickFormat format, string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
 
         return GetOption(ParseDefine(format, name));
     }
@@ -489,7 +479,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <returns>The value of a format-specific option.</returns>
     public string? GetDefine(string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
 
         return GetOption(name);
     }
@@ -501,7 +491,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <param name="name">The name of the define.</param>
     public void RemoveDefine(MagickFormat format, string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
 
         var key = ParseDefine(format, name);
         if (_options.ContainsKey(key))
@@ -514,7 +504,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <param name="name">The name of the define.</param>
     public void RemoveDefine(string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
 
         if (_options.ContainsKey(name))
             _options.Remove(name);
@@ -546,8 +536,8 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <param name="value">The value of the option.</param>
     public void SetDefine(MagickFormat format, string name, string value)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
-        Throw.IfNull(nameof(value), value);
+        Throw.IfNullOrEmpty(name);
+        Throw.IfNull(value);
 
         SetOption(ParseDefine(format, name), value);
     }
@@ -559,8 +549,8 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <param name="value">The value of the option.</param>
     public void SetDefine(string name, string value)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
-        Throw.IfNull(nameof(value), value);
+        Throw.IfNullOrEmpty(name);
+        Throw.IfNull(value);
 
         SetOption(name, value);
     }
@@ -571,7 +561,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <param name="defines">The defines to set.</param>
     public void SetDefines(IDefines defines)
     {
-        Throw.IfNull(nameof(defines), defines);
+        Throw.IfNull(defines);
 
         foreach (var define in defines.Defines)
         {
@@ -607,7 +597,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
         Depth = settings.Depth;
         Endian = settings.Endian;
         Extract = MagickGeometry.Clone(settings.Extract);
-        _font = settings._font;
+        Font = settings.Font;
         _fontPointsize = settings._fontPointsize;
         Format = settings.Format;
         Monochrome = settings.Monochrome;
@@ -633,7 +623,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
     /// <returns>The value of the option.</returns>
     protected string? GetOption(string key)
     {
-        Throw.IfNullOrEmpty(nameof(key), key);
+        Throw.IfNullOrEmpty(key);
 
         if (_options.TryGetValue(key, out var result))
             return result;
@@ -655,7 +645,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
             return name;
 
         var module = GetModule(format);
-        return Enum.GetName(module.GetType(), module) + ":" + name;
+        return EnumHelper.GetName(module) + ":" + name;
     }
 
     private static MagickFormat GetModule(MagickFormat format)
@@ -683,7 +673,7 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
         return new Density(density.X, density.Y, density.Units);
     }
 
-    private static INativeInstance CreateNativeInstance(IMagickSettings<QuantumType> instance)
+    private static NativeMagickSettings CreateNativeInstance(IMagickSettings<QuantumType> instance)
     {
         var settings = (MagickSettings)instance;
 
@@ -692,28 +682,26 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
         if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(format))
             fileName = format + ":" + fileName;
 
-        var result = new NativeMagickSettings
-        {
-            AntiAlias = settings.AntiAlias,
-            BackgroundColor = settings.BackgroundColor,
-            ColorSpace = settings.ColorSpace,
-            ColorType = settings.ColorType,
-            Compression = settings.Compression,
-            Debug = settings.Debug,
-            Density = settings.Density?.ToString(DensityUnit.Undefined),
-            Depth = settings.Depth,
-            Endian = settings.Endian,
-            Extract = settings.Extract?.ToString(),
-            Font = settings._font,
-            FontPointsize = settings._fontPointsize,
-            Format = format,
-            Interlace = settings.Interlace,
-            Monochrome = settings.Monochrome,
-            Verbose = settings.Verbose,
-        };
+        var result = NativeMagickSettings.Create();
+        result.AntiAlias_Set(settings.AntiAlias);
+        result.BackgroundColor_Set(settings.BackgroundColor);
+        result.ColorSpace_Set(settings.ColorSpace);
+        result.ColorType_Set(settings.ColorType);
+        result.Compression_Set(settings.Compression);
+        result.Debug_Set(settings.Debug);
+        result.Density_Set(settings.Density?.ToString(DensityUnit.Undefined));
+        result.Depth_Set(settings.Depth);
+        result.Endian_Set(settings.Endian);
+        result.Extract_Set(settings.Extract?.ToString());
+        result.FontPointsize_Set(settings._fontPointsize);
+        result.Format_Set(format);
+        result.Interlace_Set(settings.Interlace);
+        result.Monochrome_Set(settings.Monochrome);
+        result.Verbose_Set(settings.Verbose);
 
         result.SetColorFuzz(settings.ColorFuzz);
         result.SetFileName(fileName);
+        result.SetFont(settings.Font);
         result.SetNumberScenes(settings.NumberScenes);
         result.SetPage(settings.Page?.ToString());
         result.SetPing(settings.Ping);
@@ -737,14 +725,14 @@ public partial class MagickSettings : IMagickSettings<QuantumType>
             MagickFormat.ThreeGp => "3GP",
             MagickFormat.RadialGradient => "RADIAL-GRADIENT",
             MagickFormat.SparseColor => "SPARSE-COLOR",
-            _ => Enum.GetName(Format.GetType(), Format).ToUpperInvariant(),
+            _ => EnumHelper.GetName(Format).ToUpperInvariant(),
         };
 
     private void SetOptionAndArtifact(string key, double value)
         => SetOptionAndArtifact(key, value.ToString(CultureInfo.InvariantCulture));
 
     private void SetOptionAndArtifact(string key, Enum value)
-        => SetOptionAndArtifact(key, Enum.GetName(value.GetType(), value).ToLowerInvariant());
+        => SetOptionAndArtifact(key, EnumHelper.GetName(value).ToLowerInvariant());
 
     private void SetOptionAndArtifact(string key, string? value)
     {

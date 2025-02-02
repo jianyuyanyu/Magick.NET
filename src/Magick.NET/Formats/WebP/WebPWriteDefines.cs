@@ -26,17 +26,17 @@ public sealed class WebPWriteDefines : IWriteDefines
     public int? AlphaQuality { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether the algorithm should spend additional time optimizing the filtering strength to reach a well-balanced quality (webp:auto-filter).
+    /// Gets or sets a value indicating whether the algorithm should spend additional time optimizing the filtering strength to reach a well-balanced quality (webp:auto-filter).
     /// </summary>
     public bool? AutoFilter { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether a similar compression to that of JPEG but with less degradation should be used. (webp:emulate-jpeg-size).
+    /// Gets or sets a value indicating whether a similar compression to that of JPEG but with less degradation should be used. (webp:emulate-jpeg-size).
     /// </summary>
     public bool? EmulateJpegSize { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether RGB values should be preserved in transparent area. It's disabled by default to help compressibility.
+    /// Gets or sets a value indicating whether RGB values should be preserved in transparent area. It's disabled by default to help compressibility.
     /// </summary>
     public bool? Exact { get; set; }
 
@@ -67,12 +67,12 @@ public sealed class WebPWriteDefines : IWriteDefines
     public WebPImageHint? ImageHint { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether the image should be encoded without any loss (webp:lossless).
+    /// Gets or sets a value indicating whether the image should be encoded without any loss (webp:lossless).
     /// </summary>
     public bool? Lossless { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether the memory usage should be reduced (webp:low-memory).
+    /// Gets or sets a value indicating whether the memory usage should be reduced (webp:low-memory).
     /// </summary>
     public bool? LowMemory { get; set; }
 
@@ -80,11 +80,6 @@ public sealed class WebPWriteDefines : IWriteDefines
     /// Gets or sets the compression method to use. It controls the trade off between encoding speed and the compressed file size and quality. Possible values range from 0 to 6. Default value is 4. When higher values are utilized, the encoder spends more time inspecting additional encoding possibilities and decide on the quality gain. Lower value might result in faster processing time at the expense of larger file size and lower compression quality (webp:method).
     /// </summary>
     public int? Method { get; set; }
-
-    /// <summary>
-    /// Gets or sets the near lossless encoding, between 0 (max-loss) and 100 (off) (webp:near-lossless).
-    /// </summary>
-    public int? NearLossless { get; set; }
 
     /// <summary>
     /// Gets or sets the partition limit. Choose 0 for no quality degradation and 100 for maximum degradation (webp:partition-limit).
@@ -112,7 +107,7 @@ public sealed class WebPWriteDefines : IWriteDefines
     public int? Segment { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether the compressed picture should be exported back (webp:show-compressed).
+    /// Gets or sets a value indicating whether the compressed picture should be exported back (webp:show-compressed).
     /// </summary>
     public bool? ShowCompressed { get; set; }
 
@@ -132,12 +127,12 @@ public sealed class WebPWriteDefines : IWriteDefines
     public int? TargetSize { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether multi-threaded encoding should be enabled (webp:thread-level).
+    /// Gets or sets a value indicating whether multi-threaded encoding should be enabled (webp:thread-level).
     /// </summary>
     public bool? ThreadLevel { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating wether sharp (and slow) RGB->YUV conversion should be used. (webp:use-sharp-yuv).
+    /// Gets or sets a value indicating whether sharp (and slow) RGB->YUV conversion should be used. (webp:use-sharp-yuv).
     /// </summary>
     public bool? UseSharpYuv { get; set; }
 
@@ -186,9 +181,6 @@ public sealed class WebPWriteDefines : IWriteDefines
 
             if (Method.HasValue)
                 yield return new MagickDefine(Format, "method", Method.Value);
-
-            if (NearLossless.HasValue)
-                yield return new MagickDefine(Format, "near-lossless", NearLossless.Value);
 
             if (PartitionLimit.HasValue)
                 yield return new MagickDefine(Format, "partition-limit", PartitionLimit.Value);

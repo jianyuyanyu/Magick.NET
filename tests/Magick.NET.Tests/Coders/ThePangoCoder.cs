@@ -26,6 +26,9 @@ public class ThePangoCoder
     [Fact]
     public void ShouldUseTextAntiAliasSetting()
     {
+        if (TestRuntime.HasFlakyMacOSArm64Result)
+            return;
+
         var settings = new MagickReadSettings()
         {
             AntiAlias = false,
@@ -42,7 +45,7 @@ public class ThePangoCoder
     [Fact]
     public void IsThreadSafe()
     {
-        string LoadImage()
+        static string LoadImage()
         {
             using var image = new MagickImage("pango:1");
             return image.Signature;

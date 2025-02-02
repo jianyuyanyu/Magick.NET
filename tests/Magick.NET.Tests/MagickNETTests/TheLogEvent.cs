@@ -14,7 +14,7 @@ public partial class MagickNETTests
         [Fact]
         public void ShouldPassOrderedTests()
         {
-            ShouldNotCallLogDelegeteWhenLogEventsAreNotSet();
+            ShouldNotCallLogDelegateWhenLogEventsAreNotSet();
 
             ShouldCallLogDelegateWhenLogEventsAreSet();
 
@@ -23,10 +23,10 @@ public partial class MagickNETTests
             ShouldStopCallingLogDelegateWhenLogDelegateIsRemoved();
         }
 
-        private void ShouldNotCallLogDelegeteWhenLogEventsAreNotSet()
+        private void ShouldNotCallLogDelegateWhenLogEventsAreNotSet()
         {
             var count = 0;
-            void LogDelegate(object sender, LogEventArgs arguments)
+            void LogDelegate(object? sender, LogEventArgs arguments)
             {
                 count++;
             }
@@ -44,11 +44,11 @@ public partial class MagickNETTests
         private void ShouldCallLogDelegateWhenLogEventsAreSet()
         {
             var count = 0;
-            void LogDelegate(object sender, LogEventArgs arguments)
+            void LogDelegate(object? sender, LogEventArgs arguments)
             {
                 Assert.Null(sender);
                 Assert.NotNull(arguments);
-                Assert.NotEqual(LogEvents.None, arguments.EventType);
+                Assert.NotEqual(LogEventTypes.None, arguments.EventType);
                 Assert.NotNull(arguments.Message);
                 Assert.NotEqual(0, arguments.Message.Length);
 
@@ -57,7 +57,7 @@ public partial class MagickNETTests
 
             MagickNET.Log += LogDelegate;
 
-            MagickNET.SetLogEvents(LogEvents.Detailed);
+            MagickNET.SetLogEvents(LogEventTypes.Detailed);
 
             using var image = new MagickImage(Files.SnakewarePNG);
             image.Flip();
@@ -75,13 +75,13 @@ public partial class MagickNETTests
         private void ShouldLogTraceEventsWhenLogEventsIsSetToAll()
         {
             var traceEvents = 0;
-            void LogDelegate(object sender, LogEventArgs arguments)
+            void LogDelegate(object? sender, LogEventArgs arguments)
             {
-                if (arguments.EventType == LogEvents.Trace)
+                if (arguments.EventType == LogEventTypes.Trace)
                     traceEvents++;
             }
 
-            MagickNET.SetLogEvents(LogEvents.All);
+            MagickNET.SetLogEvents(LogEventTypes.All);
 
             MagickNET.Log += LogDelegate;
 
@@ -95,14 +95,14 @@ public partial class MagickNETTests
         private void ShouldStopCallingLogDelegateWhenLogDelegateIsRemoved()
         {
             var count = 0;
-            void LogDelegate(object sender, LogEventArgs arguments)
+            void LogDelegate(object? sender, LogEventArgs arguments)
             {
                 count++;
             }
 
             MagickNET.Log += LogDelegate;
 
-            MagickNET.SetLogEvents(LogEvents.Detailed);
+            MagickNET.SetLogEvents(LogEventTypes.Detailed);
 
             MagickNET.Log -= LogDelegate;
 

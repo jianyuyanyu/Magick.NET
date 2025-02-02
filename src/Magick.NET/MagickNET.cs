@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using ImageMagick.Configuration;
@@ -18,7 +17,7 @@ public partial class MagickNET : IMagickNET
 {
     private static LogDelegate? _nativeLog;
     private static EventHandler<LogEventArgs>? _log;
-    private static LogEvents _logEvents = LogEvents.None;
+    private static LogEventTypes _logEvents = LogEventTypes.None;
 
     /// <summary>
     /// Event that will be raised when something is logged by ImageMagick.
@@ -63,13 +62,13 @@ public partial class MagickNET : IMagickNET
     /// Gets the ImageMagick delegate libraries.
     /// </summary>
     public static string Delegates
-        => NativeMagickNET.Delegates;
+        => NativeMagickNET.Delegates_Get();
 
     /// <summary>
     /// Gets the ImageMagick features.
     /// </summary>
     public static string Features
-        => NativeMagickNET.Features;
+        => NativeMagickNET.Features_Get();
 
     /// <summary>
     /// Gets the information about the supported formats.
@@ -80,20 +79,20 @@ public partial class MagickNET : IMagickNET
     /// <summary>
     /// Gets the font families that are known by ImageMagick.
     /// </summary>
-    public static IReadOnlyCollection<string> FontFamilies
+    public static IReadOnlyList<string> FontFamilies
     {
         get
         {
             var result = new List<string>();
 
             var list = IntPtr.Zero;
-            var length = (UIntPtr)0;
 
             try
             {
-                list = NativeMagickNET.GetFonts(out length);
+                list = NativeMagickNET.GetFonts(out var length);
+                result.Capacity = (int)length;
 
-                for (var i = 0; i < (int)length; i++)
+                for (var i = 0U; i < (int)length; i++)
                 {
                     var fontFamily = NativeMagickNET.GetFontFamily(list, i);
                     if (fontFamily is not null && fontFamily.Length > 0 && !result.Contains(fontFamily))
@@ -113,20 +112,20 @@ public partial class MagickNET : IMagickNET
     /// <summary>
     /// Gets the font names that are known by ImageMagick.
     /// </summary>
-    public static IReadOnlyCollection<string> FontNames
+    public static IReadOnlyList<string> FontNames
     {
         get
         {
             var result = new List<string>();
 
             var list = IntPtr.Zero;
-            var length = (UIntPtr)0;
 
             try
             {
-                list = NativeMagickNET.GetFonts(out length);
+                list = NativeMagickNET.GetFonts(out var length);
+                result.Capacity = (int)length;
 
-                for (var i = 0; i < (int)length; i++)
+                for (var i = 0U; i < (int)length; i++)
                 {
                     var fontName = NativeMagickNET.GetFontName(list, i);
                     if (fontName is not null && fontName.Length > 0)
@@ -147,20 +146,13 @@ public partial class MagickNET : IMagickNET
     /// Gets the version of ImageMagick.
     /// </summary>
     public static string ImageMagickVersion
-        => NativeMagickNET.ImageMagickVersion;
+        => NativeMagickNET.ImageMagickVersion_Get();
 
     /// <summary>
     /// Gets the version of Magick.NET.
     /// </summary>
     public static string Version
-    {
-        get
-        {
-            var title = TypeHelper.GetCustomAttribute<AssemblyTitleAttribute>(typeof(MagickNET));
-            var version = TypeHelper.GetCustomAttribute<AssemblyFileVersionAttribute>(typeof(MagickNET));
-            return title.Title + " " + version.Version;
-        }
-    }
+        => MagickVersion.Version;
 
     /// <summary>
     /// Gets the ImageMagick delegate libraries.
@@ -175,21 +167,15 @@ public partial class MagickNET : IMagickNET
         => Features;
 
     /// <summary>
-    /// Gets the information about the supported formats.
-    /// </summary>
-    IReadOnlyCollection<IMagickFormatInfo> IMagickNET.SupportedFormats
-        => SupportedFormats;
-
-    /// <summary>
     /// Gets the font families that are known by ImageMagick.
     /// </summary>
-    IReadOnlyCollection<string> IMagickNET.FontFamilies
+    IReadOnlyList<string> IMagickNET.FontFamilies
         => FontFamilies;
 
     /// <summary>
     /// Gets the font names that are known by ImageMagick.
     /// </summary>
-    IReadOnlyCollection<string> IMagickNET.FontNames
+    IReadOnlyList<string> IMagickNET.FontNames
         => FontNames;
 
     /// <summary>
@@ -199,19 +185,27 @@ public partial class MagickNET : IMagickNET
         => ImageMagickVersion;
 
     /// <summary>
+    /// Gets the information about the supported formats.
+    /// </summary>
+    IReadOnlyCollection<IMagickFormatInfo> IMagickNET.SupportedFormats
+        => SupportedFormats;
+
+    /// <summary>
     /// Gets the version of Magick.NET.
     /// </summary>
     string IMagickNET.Version
         => Version;
+
+    internal static string TemporaryDirectory { get; private set; } = Path.GetTempPath();
 
     /// <summary>
     /// Gets the environment variable with the specified name.
     /// </summary>
     /// <param name="name">The name of the environment variable.</param>
     /// <returns>The environment variable with the specified name.</returns>
-    public static string GetEnvironmentVariable(string name)
+    public static string? GetEnvironmentVariable(string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
         return Environment.GetEnv(name);
     }
 
@@ -242,9 +236,9 @@ public partial class MagickNET : IMagickNET
     /// <returns>The path of the folder that was created and contains the configuration files.</returns>
     public static string Initialize(IConfigurationFiles configFiles)
     {
-        Throw.IfNull(nameof(configFiles), configFiles);
+        Throw.IfNull(configFiles);
 
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var path = Path.Combine(TemporaryDirectory, Guid.NewGuid().ToString());
         Directory.CreateDirectory(path);
 
         InitializeConfiguration(configFiles, path);
@@ -259,7 +253,7 @@ public partial class MagickNET : IMagickNET
     /// <param name="path">The directory to save the configuration files in.</param>
     public static void Initialize(IConfigurationFiles configFiles, string path)
     {
-        Throw.IfNull(nameof(configFiles), configFiles);
+        Throw.IfNull(configFiles);
 
         var newPath = FileHelper.GetFullPath(path);
 
@@ -270,7 +264,7 @@ public partial class MagickNET : IMagickNET
     /// Resets the pseudo-random number generator secret key.
     /// </summary>
     public static void ResetRandomSeed()
-        => NativeMagickNET.SetRandomSeed(-1);
+        => NativeMagickNET.ResetRandomSeed();
 
     /// <summary>
     /// Set the path to the default font file.
@@ -278,7 +272,7 @@ public partial class MagickNET : IMagickNET
     /// <param name="file">The file to use at the default font file.</param>
     public static void SetDefaultFontFile(FileInfo file)
     {
-        Throw.IfNull(nameof(file), file);
+        Throw.IfNull(file);
 
         SetDefaultFontFile(file.FullName);
     }
@@ -289,7 +283,7 @@ public partial class MagickNET : IMagickNET
     /// <param name="fileName">The file name to use at the default font file.</param>
     public static void SetDefaultFontFile(string fileName)
     {
-        Throw.IfNullOrEmpty(nameof(fileName), fileName);
+        Throw.IfNullOrEmpty(fileName);
 
         NativeMagickNET.SetDefaultFontFile(fileName);
     }
@@ -301,7 +295,7 @@ public partial class MagickNET : IMagickNET
     /// <param name="value">The value of the environment variable.</param>
     public static void SetEnvironmentVariable(string name, string value)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
         Environment.SetEnv(name, value);
     }
 
@@ -330,11 +324,11 @@ public partial class MagickNET : IMagickNET
 
     /// <summary>
     /// Set the events that will be written to the log. The log will be written to the Log event
-    /// and the debug window in VisualStudio. To change the log settings you must use a custom
-    /// log.xml file.
+    /// and the debug window in VisualStudio. To change the log settings you a custom log.xml file
+    /// should be used.
     /// </summary>
-    /// <param name="events">The events that will be logged.</param>
-    public static void SetLogEvents(LogEvents events)
+    /// <param name="events">The events that should be logged.</param>
+    public static void SetLogEvents(LogEventTypes events)
     {
         _logEvents = events;
 
@@ -358,13 +352,16 @@ public partial class MagickNET : IMagickNET
     /// </summary>
     /// <param name="path">The path where temp files will be written.</param>
     public static void SetTempDirectory(string path)
-        => Environment.SetEnv("MAGICK_TEMPORARY_PATH", FileHelper.GetFullPath(path));
+    {
+        TemporaryDirectory = FileHelper.GetFullPath(path);
+        Environment.SetEnv("MAGICK_TEMPORARY_PATH", TemporaryDirectory);
+    }
 
     /// <summary>
     /// Sets the pseudo-random number generator secret key.
     /// </summary>
     /// <param name="seed">The secret key.</param>
-    public static void SetRandomSeed(int seed)
+    public static void SetRandomSeed(ulong seed)
         => NativeMagickNET.SetRandomSeed(seed);
 
     /// <summary>
@@ -372,7 +369,7 @@ public partial class MagickNET : IMagickNET
     /// </summary>
     /// <param name="name">The name of the environment variable.</param>
     /// <returns>The environment variable with the specified name.</returns>
-    string IMagickNET.GetEnvironmentVariable(string name)
+    string? IMagickNET.GetEnvironmentVariable(string name)
         => GetEnvironmentVariable(name);
 
     /// <summary>
@@ -462,7 +459,7 @@ public partial class MagickNET : IMagickNET
     /// log.xml file.
     /// </summary>
     /// <param name="events">The events that will be logged.</param>
-    void IMagickNET.SetLogEvents(LogEvents events)
+    void IMagickNET.SetLogEvents(LogEventTypes events)
         => SetLogEvents(events);
 
     /// <summary>
@@ -484,15 +481,15 @@ public partial class MagickNET : IMagickNET
     /// Sets the pseudo-random number generator secret key.
     /// </summary>
     /// <param name="seed">The secret key.</param>
-    void IMagickNET.SetRandomSeed(int seed)
+    void IMagickNET.SetRandomSeed(ulong seed)
         => SetRandomSeed(seed);
 
     private static void CheckImageMagickFiles(string path)
     {
-        foreach (var configurationFile in ((IConfigurationFiles)ConfigurationFiles.Default).All)
+        foreach (var configurationFile in ConfigurationFiles.Default.All)
         {
             var fileName = Path.Combine(path, configurationFile.FileName);
-            Throw.IfFalse(nameof(path), File.Exists(fileName), $"Unable to find file: {fileName}");
+            Throw.IfFalse(File.Exists(fileName), nameof(path), "Unable to find file: {0}", fileName);
         }
     }
 
@@ -517,17 +514,17 @@ public partial class MagickNET : IMagickNET
         if (_log is null)
             return;
 
-        var managedText = UTF8Marshaler.NativeToManaged(text);
-        _log(null, new LogEventArgs((LogEvents)type, managedText));
+        var instance = UTF8Marshaler.CreateInstance(text);
+        _log(null, new LogEventArgs((LogEventTypes)type, instance));
     }
 
     private static void SetLogEvents()
     {
         string eventFlags;
 
-        if (_logEvents == LogEvents.All)
+        if (_logEvents == LogEventTypes.All)
             eventFlags = "All,Trace";
-        else if (_logEvents == LogEvents.Detailed)
+        else if (_logEvents == LogEventTypes.Detailed)
             eventFlags = "All";
         else
             eventFlags = EnumHelper.ConvertFlags(_logEvents);

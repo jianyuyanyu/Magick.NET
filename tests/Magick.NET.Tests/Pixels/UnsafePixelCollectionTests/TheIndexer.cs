@@ -15,7 +15,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.RedPNG);
             using var pixels = image.GetPixelsUnsafe();
-            var pixel = pixels[image.Width + 1, 0];
+            var pixel = pixels[(int)image.Width + 1, 0];
         }
 
         [Fact]
@@ -23,7 +23,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.RedPNG);
             using var pixels = image.GetPixelsUnsafe();
-            var pixel = pixels[0, image.Height + 1];
+            var pixel = pixels[0, (int)image.Height + 1];
         }
 
         [Fact]
@@ -33,7 +33,7 @@ public partial class UnsafePixelCollectionTests
             using var pixels = image.GetPixelsUnsafe();
             var pixel = pixels[300, 100];
 
-            ColorAssert.Equal(MagickColors.Red, pixel.ToColor());
+            ColorAssert.Equal(MagickColors.Red, pixel?.ToColor());
         }
     }
 }

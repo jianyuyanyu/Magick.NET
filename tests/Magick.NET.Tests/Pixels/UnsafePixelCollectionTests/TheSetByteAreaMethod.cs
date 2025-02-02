@@ -15,7 +15,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
-            pixels.SetByteArea(10, 10, 1000, 1000, null);
+            pixels.SetByteArea(10, 10, 1000, 1000, null!);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ public partial class UnsafePixelCollectionTests
             var values = new byte[113 * 108 * image.ChannelCount];
             pixels.SetByteArea(10, 10, 113, 108, values);
 
-            ColorAssert.Equal(MagickColors.Black, image, image.Width - 1, image.Height - 1);
+            ColorAssert.Equal(MagickColors.Black, image, (int)image.Width - 1, (int)image.Height - 1);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
-            pixels.SetByteArea(null, new byte[] { 0 });
+            pixels.SetByteArea(null!, new byte[] { 0 });
         }
 
         [Fact]
@@ -62,7 +62,7 @@ public partial class UnsafePixelCollectionTests
             var values = new byte[113 * 108 * image.ChannelCount];
             pixels.SetByteArea(new MagickGeometry(10, 10, 113, 108), values);
 
-            ColorAssert.Equal(MagickColors.Black, image, image.Width - 1, image.Height - 1);
+            ColorAssert.Equal(MagickColors.Black, image, (int)image.Width - 1, (int)image.Height - 1);
         }
     }
 }

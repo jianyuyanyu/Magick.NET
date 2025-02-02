@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -60,7 +61,9 @@ public partial class ColorGrayTests
         [Fact]
         public void ShouldReturnTheCorrectValueWhenCastedFromMagickColor()
         {
-            var actual = (ColorGray)new MagickColor(Quantum.Max, 0, 0, 0, Quantum.Max);
+            var actual = (ColorGray?)new MagickColor(Quantum.Max, 0, 0, 0, Quantum.Max);
+
+            Assert.NotNull(actual);
             Assert.InRange(actual.Shade, 0.20, 0.22);
         }
     }

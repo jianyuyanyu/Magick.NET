@@ -13,7 +13,7 @@ using QuantumType = System.Single;
 #error Not implemented!
 #endif
 
-namespace ImageMagick;
+namespace ImageMagick.Colors;
 
 /// <summary>
 /// Base class for colors.
@@ -26,7 +26,7 @@ public abstract class ColorBase : IEquatable<ColorBase?>, IComparable<ColorBase?
     /// <param name="color">The color to use.</param>
     protected ColorBase(IMagickColor<QuantumType> color)
     {
-        Throw.IfNull(nameof(color), color);
+        Throw.IfNull(color);
 
         Color = color;
     }

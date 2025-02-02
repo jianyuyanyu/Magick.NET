@@ -4,7 +4,7 @@
 namespace ImageMagick;
 
 /// <summary>
-/// Specifies the different file formats that are supported by ImageMagick.
+/// Specifies the different image formats that are supported by ImageMagick.
 /// </summary>
 public enum MagickFormat
 {
@@ -14,7 +14,7 @@ public enum MagickFormat
     Unknown,
 
     /// <summary>
-    /// Hasselblad CFV/H3D39II.
+    /// Hasselblad CFV/H3D39II Raw Format.
     /// </summary>
     ThreeFr,
 
@@ -54,7 +54,7 @@ public enum MagickFormat
     Art,
 
     /// <summary>
-    /// Sony Alpha Raw Image Format.
+    /// Sony Alpha Raw Format.
     /// </summary>
     Arw,
 
@@ -184,17 +184,17 @@ public enum MagickFormat
     Cmyka,
 
     /// <summary>
-    /// Canon Digital Camera Raw Image Format.
+    /// Canon Digital Camera Raw Format.
     /// </summary>
     Cr2,
 
     /// <summary>
-    /// Canon Digital Camera Raw Image Format.
+    /// Canon Digital Camera Raw Format.
     /// </summary>
     Cr3,
 
     /// <summary>
-    /// Canon Digital Camera Raw Image Format.
+    /// Canon Digital Camera Raw Format.
     /// </summary>
     Crw,
 
@@ -224,12 +224,12 @@ public enum MagickFormat
     Dcm,
 
     /// <summary>
-    /// Kodak Digital Camera Raw Image File.
+    /// Kodak Digital Camera Raw Format.
     /// </summary>
     Dcr,
 
     /// <summary>
-    /// Raw Photo Decoder (dcraw) (Dng).
+    /// Raw Photo Decoder (dcraw).
     /// </summary>
     Dcraw,
 
@@ -254,7 +254,7 @@ public enum MagickFormat
     Dib,
 
     /// <summary>
-    /// Digital Negative.
+    /// Digital Negative Raw Format.
     /// </summary>
     Dng,
 
@@ -329,7 +329,7 @@ public enum MagickFormat
     Ept3,
 
     /// <summary>
-    /// Epson RAW Format.
+    /// Epson Raw Format.
     /// </summary>
     Erf,
 
@@ -352,6 +352,11 @@ public enum MagickFormat
     /// Farbfeld.
     /// </summary>
     Ff,
+
+    /// <summary>
+    /// Hasselblad CFV/H3D39II Raw Format.
+    /// </summary>
+    Fff,
 
     /// <summary>
     /// Uniform Resource Locator (file://).
@@ -504,7 +509,7 @@ public enum MagickFormat
     Icon,
 
     /// <summary>
-    /// Phase One Raw Image Format.
+    /// Phase One Raw Format.
     /// </summary>
     Iiq,
 
@@ -609,12 +614,12 @@ public enum MagickFormat
     K,
 
     /// <summary>
-    /// Kodak Digital Camera Raw Image Format.
+    /// Kodak Digital Camera Raw Format.
     /// </summary>
     K25,
 
     /// <summary>
-    /// Kodak Digital Camera Raw Image Format.
+    /// Kodak Digital Camera Raw Format.
     /// </summary>
     Kdc,
 
@@ -664,7 +669,12 @@ public enum MagickFormat
     Matte,
 
     /// <summary>
-    /// Mamiya Raw Image File.
+    /// Minolta Digital Camera Raw Format.
+    /// </summary>
+    Mdc,
+
+    /// <summary>
+    /// Mamiya Raw Format.
     /// </summary>
     Mef,
 
@@ -687,6 +697,11 @@ public enum MagickFormat
     /// Raw bi-level bitmap.
     /// </summary>
     Mono,
+
+    /// <summary>
+    /// Aptus Leaf Raw Format.
+    /// </summary>
+    Mos,
 
     /// <summary>
     /// MPEG Video Stream.
@@ -714,7 +729,12 @@ public enum MagickFormat
     Mpg,
 
     /// <summary>
-    /// Sony (Minolta) Raw Image File.
+    /// Joint Photographic Experts Group JFIF format (Jpeg).
+    /// </summary>
+    Mpo,
+
+    /// <summary>
+    /// Sony (Minolta) Raw Format.
     /// </summary>
     Mrw,
 
@@ -739,12 +759,12 @@ public enum MagickFormat
     Mvg,
 
     /// <summary>
-    /// Nikon Digital SLR Camera Raw Image File.
+    /// Nikon Digital SLR Camera Raw Format.
     /// </summary>
     Nef,
 
     /// <summary>
-    /// Nikon Digital SLR Camera Raw Image File.
+    /// Nikon Digital SLR Camera Raw Format.
     /// </summary>
     Nrw,
 
@@ -764,7 +784,7 @@ public enum MagickFormat
     Ora,
 
     /// <summary>
-    /// Olympus Digital Camera Raw Image File.
+    /// Olympus Digital Camera Raw Format.
     /// </summary>
     Orf,
 
@@ -849,7 +869,7 @@ public enum MagickFormat
     Pdfa,
 
     /// <summary>
-    /// Pentax Electronic File.
+    /// Pentax Electronic Raw Format.
     /// </summary>
     Pef,
 
@@ -874,6 +894,11 @@ public enum MagickFormat
     Pfm,
 
     /// <summary>
+    /// JPEG 2000 uncompressed format.
+    /// </summary>
+    Pgx,
+
+    /// <summary>
     /// Portable graymap format (gray scale).
     /// </summary>
     Pgm,
@@ -882,11 +907,6 @@ public enum MagickFormat
     /// Portable half float format.
     /// </summary>
     Phm,
-
-    /// <summary>
-    /// JPEG 2000 uncompressed format.
-    /// </summary>
-    Pgx,
 
     /// <summary>
     /// Personal Icon.
@@ -1074,9 +1094,14 @@ public enum MagickFormat
     Rsvg,
 
     /// <summary>
-    /// Panasonic Lumix Raw Image.
+    /// Panasonic Lumix Raw Format.
     /// </summary>
     Rw2,
+
+    /// <summary>
+    /// Leica Raw Format.
+    /// </summary>
+    Rwl,
 
     /// <summary>
     /// ZX-Spectrum SCREEN$.
@@ -1134,9 +1159,19 @@ public enum MagickFormat
     Srf,
 
     /// <summary>
+    /// Samsung Raw Format.
+    /// </summary>
+    Srw,
+
+    /// <summary>
     /// Steganographic image.
     /// </summary>
     Stegano,
+
+    /// <summary>
+    /// Sinar CaptureShop Raw Format.
+    /// </summary>
+    Sti,
 
     /// <summary>
     /// String to image and back.
@@ -1299,7 +1334,7 @@ public enum MagickFormat
     Wpg,
 
     /// <summary>
-    /// Sigma Camera RAW Picture File.
+    /// Sigma Camera RAW Format.
     /// </summary>
     X3f,
 
@@ -1357,4 +1392,9 @@ public enum MagickFormat
     /// CCIR 601 4:1:1 or 4:2:2.
     /// </summary>
     Yuv,
+
+    /// <summary>
+    /// AVC Image File Format.
+    /// </summary>
+    Avci,
 }

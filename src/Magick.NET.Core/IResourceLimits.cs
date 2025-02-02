@@ -31,13 +31,20 @@ public interface IResourceLimits
 
     /// <summary>
     /// Gets or sets the max memory request in bytes. ImageMagick maintains a separate memory pool for large
-    /// resource requests. If the limit is exceeded, the allocation is instead memory-mapped on disk.
+    /// resource requests. If the limit is exceeded when allocating pixels, the allocation is instead memory-mapped
+    /// on disk.
     /// </summary>
     ulong MaxMemoryRequest { get; set; }
 
     /// <summary>
+    /// Gets or sets the max size of a profile in bytes that can be added to the image.
+    /// </summary>
+    ulong MaxProfileSize { get; set; }
+
+    /// <summary>
     /// Gets or sets the pixel cache limit in bytes. Once this memory limit is exceeded, all subsequent pixels cache
-    /// operations are to/from disk.
+    /// operations are to/from disk. The default value of this is 50% of the available memory on the machine in 64-bit mode.
+    /// When running in 32-bit mode this is 50% of the limit of the operating system.
     /// </summary>
     ulong Memory { get; set; }
 
@@ -52,13 +59,19 @@ public interface IResourceLimits
     ulong Throttle { get; set; }
 
     /// <summary>
+    /// Gets or sets the maximum number of seconds that the process is permitted to execute. Exceed this limit and
+    /// an exception is thrown and processing stops.
+    /// </summary>
+    ulong Time { get; set; }
+
+    /// <summary>
     /// Gets or sets the maximum width of an image.
     /// </summary>
     ulong Width { get; set; }
 
     /// <summary>
-    /// Set the maximum percentage of memory that can be used for image data. This also changes
-    /// the <see cref="Area"/> limit to four times the number of bytes.
+    /// Set the maximum percentage of <see cref="Memory"/> that can be used for image data.
+    /// This also changes the <see cref="Area"/> limit to four times the number of bytes.
     /// </summary>
     /// <param name="percentage">The percentage to use.</param>
     void LimitMemory(Percentage percentage);

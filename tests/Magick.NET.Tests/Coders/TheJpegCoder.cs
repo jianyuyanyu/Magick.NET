@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using System.IO;
 using ImageMagick;
 using Xunit;
@@ -16,6 +17,7 @@ public class TheJpegCoder
         using var pixels = image.GetPixels();
         var color = pixels.GetPixel(0, 0).ToColor();
 
+        Assert.NotNull(color);
         Assert.Equal(Quantum.Max, color.R);
         Assert.Equal(Quantum.Max, color.G);
         Assert.Equal(Quantum.Max, color.B);
@@ -55,5 +57,27 @@ public class TheJpegCoder
 
         Assert.NotNull(result);
         Assert.True(result.Equals(profile));
+    }
+
+    [Fact]
+    public void ShouldSupportWritingExifProfileWithMaxLength()
+    {
+        using var input = new MagickImage(Files.FujiFilmFinePixS1ProJPG);
+
+        var profile = input.GetExifProfile();
+        Assert.NotNull(profile);
+
+        var data = profile.ToByteArray();
+        Assert.NotNull(data);
+
+        Array.Resize(ref data, 65533);
+        input.SetProfile(new ImageProfile("exif", data));
+
+        data = input.ToByteArray(MagickFormat.Jpeg);
+
+        using var output = new MagickImage(data);
+
+        profile = output.GetExifProfile();
+        Assert.NotNull(profile);
     }
 }

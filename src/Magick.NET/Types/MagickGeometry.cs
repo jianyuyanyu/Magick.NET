@@ -11,26 +11,37 @@ namespace ImageMagick;
 /// </summary>
 public sealed partial class MagickGeometry : IMagickGeometry
 {
+    private readonly bool _includeXyInToString;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MagickGeometry"/> class.
     /// </summary>
     public MagickGeometry()
-        => Initialize(0, 0, 0, 0);
+    {
+        Initialize(0, 0, 0, 0);
+        _includeXyInToString = false;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagickGeometry"/> class using the specified width and height.
     /// </summary>
     /// <param name="widthAndHeight">The width and height.</param>
-    public MagickGeometry(int widthAndHeight)
-        => Initialize(0, 0, widthAndHeight, widthAndHeight);
+    public MagickGeometry(uint widthAndHeight)
+    {
+        Initialize(0, 0, widthAndHeight, widthAndHeight);
+        _includeXyInToString = false;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagickGeometry"/> class using the specified width and height.
     /// </summary>
     /// <param name="width">The width.</param>
     /// <param name="height">The height.</param>
-    public MagickGeometry(int width, int height)
-        => Initialize(0, 0, width, height);
+    public MagickGeometry(uint width, uint height)
+    {
+        Initialize(0, 0, width, height);
+        _includeXyInToString = false;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagickGeometry"/> class using the specified offsets, width and height.
@@ -39,20 +50,21 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// <param name="y">The Y offset from origin.</param>
     /// <param name="width">The width.</param>
     /// <param name="height">The height.</param>
-    public MagickGeometry(int x, int y, int width, int height)
-        => Initialize(x, y, width, height);
+    public MagickGeometry(int x, int y, uint width, uint height)
+    {
+        Initialize(x, y, width, height);
+        _includeXyInToString = true;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagickGeometry"/> class using the specified width and height.
     /// </summary>
     /// <param name="percentageWidth">The percentage of the width.</param>
-    /// <param name="percentageHeight">The percentage of the  height.</param>
+    /// <param name="percentageHeight">The percentage of the height.</param>
     public MagickGeometry(Percentage percentageWidth, Percentage percentageHeight)
     {
-        Throw.IfNegative(nameof(percentageWidth), percentageWidth);
-        Throw.IfNegative(nameof(percentageHeight), percentageHeight);
-
-        InitializeFromPercentage(0, 0, (int)percentageWidth, (int)percentageHeight);
+        InitializeFromPercentage(0, 0, percentageWidth, percentageHeight);
+        _includeXyInToString = false;
     }
 
     /// <summary>
@@ -61,13 +73,11 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// <param name="x">The X offset from origin.</param>
     /// <param name="y">The Y offset from origin.</param>
     /// <param name="percentageWidth">The percentage of the width.</param>
-    /// <param name="percentageHeight">The percentage of the  height.</param>
+    /// <param name="percentageHeight">The percentage of the height.</param>
     public MagickGeometry(int x, int y, Percentage percentageWidth, Percentage percentageHeight)
     {
-        Throw.IfNegative(nameof(percentageWidth), percentageWidth);
-        Throw.IfNegative(nameof(percentageHeight), percentageHeight);
-
-        InitializeFromPercentage(x, y, (int)percentageWidth, (int)percentageHeight);
+        InitializeFromPercentage(x, y, percentageWidth, percentageHeight);
+        _includeXyInToString = true;
     }
 
     /// <summary>
@@ -77,19 +87,18 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// {+-}&lt;xoffset&gt;{+-}&lt;yoffset&gt; (where width, height, xoffset, and yoffset are numbers).</param>
     public MagickGeometry(string value)
     {
-        Throw.IfNullOrEmpty(nameof(value), value);
+        Throw.IfNullOrEmpty(value);
 
-        using var instance = new NativeMagickGeometry();
+        using var instance = NativeMagickGeometry.Create();
         var flags = instance.Initialize(value);
 
         if (!EnumHelper.HasFlag(flags, GeometryFlags.AspectRatio))
             Initialize(instance, flags);
         else
             InitializeFromAspectRation(instance, value);
-    }
 
-    private MagickGeometry(NativeMagickGeometry instance)
-        => Initialize(instance);
+        _includeXyInToString = value.Contains("+") || value.Contains("-");
+    }
 
     /// <summary>
     /// Gets a value indicating whether the value is an aspect ratio.
@@ -109,7 +118,7 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// <summary>
     /// Gets or sets the height of the geometry.
     /// </summary>
-    public int Height { get; set; }
+    public uint Height { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the image is resized without preserving aspect ratio (!).
@@ -134,7 +143,7 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// <summary>
     /// Gets or sets the width of the geometry.
     /// </summary>
-    public int Width { get; set; }
+    public uint Width { get; set; }
 
     /// <summary>
     /// Gets or sets the X offset from origin.
@@ -226,10 +235,10 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// Initializes a new <see cref="IMagickGeometry"/> instance using the specified page size.
     /// </summary>
     /// <param name="pageSize">The page size.</param>
-    /// <returns>A <see cref="IMagickGeometry"/> instance that represents the specified page size.</returns>
+    /// <returns>A <see cref="IMagickGeometry"/> instance that represents the specified page size at 72 dpi.</returns>
     public static IMagickGeometry FromPageSize(string pageSize)
     {
-        Throw.IfNullOrEmpty(nameof(pageSize), pageSize);
+        Throw.IfNullOrEmpty(pageSize);
 
         var rectangle = MagickRectangle.FromPageSize(pageSize);
         if (rectangle is null)
@@ -297,33 +306,27 @@ public sealed partial class MagickGeometry : IMagickGeometry
     /// </summary>
     /// <returns>A hash code for the current instance.</returns>
     public override int GetHashCode()
-    {
-        return
-            Width.GetHashCode() ^
-            Height.GetHashCode() ^
-            X.GetHashCode() ^
-            Y.GetHashCode() ^
-            AspectRatio.GetHashCode() ^
-            IsPercentage.GetHashCode() ^
-            IgnoreAspectRatio.GetHashCode() ^
-            Less.GetHashCode() ^
-            Greater.GetHashCode() ^
-            FillArea.GetHashCode() ^
-            LimitPixels.GetHashCode();
-    }
+        => Width.GetHashCode() ^
+           Height.GetHashCode() ^
+           X.GetHashCode() ^
+           Y.GetHashCode() ^
+           AspectRatio.GetHashCode() ^
+           IsPercentage.GetHashCode() ^
+           IgnoreAspectRatio.GetHashCode() ^
+           Less.GetHashCode() ^
+           Greater.GetHashCode() ^
+           FillArea.GetHashCode() ^
+           LimitPixels.GetHashCode();
 
     /// <summary>
-    /// Initializes the geometry using the sepcified value.
+    /// Initializes the geometry using the specified value.
     /// </summary>
     /// <param name="x">The X offset from origin.</param>
     /// <param name="y">The Y offset from origin.</param>
     /// <param name="width">The width.</param>
     /// <param name="height">The height.</param>
-    public void Initialize(int x, int y, int width, int height)
+    public void Initialize(int x, int y, uint width, uint height)
     {
-        Throw.IfNegative(nameof(width), width);
-        Throw.IfNegative(nameof(height), height);
-
         X = x;
         Y = y;
         Width = width;
@@ -341,15 +344,22 @@ public sealed partial class MagickGeometry : IMagickGeometry
 
         var result = string.Empty;
 
-        if (Width > 0)
-            result += Width;
+        if (Width == 0 && Height == 0)
+        {
+            result = "0x0";
+        }
+        else
+        {
+            if (Width > 0)
+                result += Width;
 
-        if (Height > 0)
-            result += "x" + Height;
-        else if (!IsPercentage)
-            result += "x";
+            if (Height > 0)
+                result += "x" + Height;
+            else if (!IsPercentage)
+                result += "x";
+        }
 
-        if (X != 0 || Y != 0)
+        if (X != 0 || Y != 0 || _includeXyInToString)
         {
             if (X >= 0)
                 result += '+';
@@ -410,7 +420,7 @@ public sealed partial class MagickGeometry : IMagickGeometry
     internal static IMagickGeometry? FromString(string? value)
         => value is null ? null : new MagickGeometry(value);
 
-    private static int ParseInt(string value)
+    private static uint ParseUInt(string value)
     {
         var index = 0;
         while (index < value.Length && !char.IsNumber(value[index]))
@@ -420,29 +430,26 @@ public sealed partial class MagickGeometry : IMagickGeometry
         while (index < value.Length && char.IsNumber(value[index]))
             index++;
 
-        return int.Parse(value.Substring(start, index - start), CultureInfo.InvariantCulture);
+        return uint.Parse(value.Substring(start, index - start), CultureInfo.InvariantCulture);
     }
 
-    private void InitializeFromPercentage(int x, int y, int width, int height)
+    private void InitializeFromPercentage(int x, int y, Percentage percentageWidth, Percentage percentageHeight)
     {
-        Initialize(x, y, width, height);
+        Throw.IfNegative(percentageWidth);
+        Throw.IfNegative(percentageHeight);
+
+        Initialize(x, y, (uint)percentageWidth, (uint)percentageHeight);
         IsPercentage = true;
-    }
-
-    private void Initialize(NativeMagickGeometry instance)
-    {
-        X = (int)instance.X;
-        Y = (int)instance.Y;
-        Width = (int)instance.Width;
-        Height = (int)instance.Height;
     }
 
     private void Initialize(NativeMagickGeometry instance, GeometryFlags flags)
     {
-        Throw.IfTrue(nameof(flags), flags == GeometryFlags.NoValue, "Invalid geometry specified.");
+        Throw.IfTrue(flags == GeometryFlags.NoValue, nameof(flags), "Invalid geometry specified.");
 
-        Initialize(instance);
-
+        X = (int)instance.X_Get();
+        Y = (int)instance.Y_Get();
+        Width = (uint)instance.Width_Get();
+        Height = (uint)instance.Height_Get();
         IsPercentage = EnumHelper.HasFlag(flags, GeometryFlags.PercentValue);
         IgnoreAspectRatio = EnumHelper.HasFlag(flags, GeometryFlags.IgnoreAspectRatio);
         FillArea = EnumHelper.HasFlag(flags, GeometryFlags.FillArea);
@@ -456,10 +463,10 @@ public sealed partial class MagickGeometry : IMagickGeometry
         AspectRatio = true;
 
         var ratio = value.Split(':');
-        Width = ParseInt(ratio[0]);
-        Height = ParseInt(ratio[1]);
+        Width = ParseUInt(ratio[0]);
+        Height = ParseUInt(ratio[1]);
 
-        X = (int)instance.X;
-        Y = (int)instance.Y;
+        X = (int)instance.X_Get();
+        Y = (int)instance.Y_Get();
     }
 }

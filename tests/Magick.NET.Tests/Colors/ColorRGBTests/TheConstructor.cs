@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
-using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -14,10 +14,7 @@ public partial class ColorRGBTests
         [Fact]
         public void ShouldThrowExceptionWhenColorIsNull()
         {
-            Assert.Throws<ArgumentNullException>("color", () =>
-            {
-                new ColorRGB(null);
-            });
+            Assert.Throws<ArgumentNullException>("color", () => { new ColorRGB(null!); });
         }
     }
 }

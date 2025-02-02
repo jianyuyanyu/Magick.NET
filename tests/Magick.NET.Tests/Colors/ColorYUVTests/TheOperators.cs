@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -60,7 +61,9 @@ public partial class ColorYUVTests
         [Fact]
         public void ShouldReturnTheCorrectValueWhenCastedFromMagickColor()
         {
-            var actual = (ColorYUV)new MagickColor("#BFFFDFFF9FFFFFFF");
+            var actual = (ColorYUV?)new MagickColor("#BFFFDFFF9FFFFFFF");
+
+            Assert.NotNull(actual);
             Assert.InRange(actual.Y, 0.80, 0.81);
             Assert.InRange(actual.U, 0.40, 0.41);
             Assert.InRange(actual.V, 0.44, 0.45);

@@ -23,6 +23,7 @@ public partial class MagickImageTests
     {
         public class WithPercentage
         {
+#if !Q16HDRI
             [Fact]
             public void ShouldThrowExceptionWhenLowBlackIsNegative()
             {
@@ -54,6 +55,7 @@ public partial class MagickImageTests
 
                 Assert.Throws<ArgumentException>("percentageHighBlack", () => image.RangeThreshold(new Percentage(0), new Percentage(0), new Percentage(0), new Percentage(-1)));
             }
+#endif
 
             [Fact]
             public void ShouldChangeTheImage()

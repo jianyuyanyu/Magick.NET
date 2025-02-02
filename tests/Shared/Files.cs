@@ -97,7 +97,6 @@ public static class Files
         {
             @"../../../../",
             @"../../../../../Magick.NET.Tests/", // Other tests projects
-            @"../../../../../Tests/Magick.NET.Tests/", // Code coverage
         };
 
         foreach (var path in paths)
@@ -107,7 +106,7 @@ public static class Files
                 return directory;
         }
 
-        throw new InvalidOperationException("Unable to find the images folder, current directory is: " + Path.GetFullPath("."));
+        throw new InvalidOperationException($"Unable to find the images folder, current directory is: {Path.GetFullPath(".")}");
     }
 
     public static class Builtin
@@ -139,6 +138,9 @@ public static class Files
         public static string IgnoreTagTIF
             => Root + @"Images/Coders/IgnoreTag.tif";
 
+        public static string InvalidCrcBMP
+            => Root + "Images/Coders/InvalidCrc.bmp";
+
         public static string LayerStylesSamplePSD
             => Root + @"Images/Coders/layer-styles-sample.psd";
 
@@ -168,6 +170,9 @@ public static class Files
 
         public static string TestDDS
             => Root + @"Images/Coders/Test.dds";
+
+        public static string TestJP2
+            => Root + @"Images/Coders/Test.jp2";
 
         public static string TestMNG
             => Root + @"Images/Coders/Test.mng";

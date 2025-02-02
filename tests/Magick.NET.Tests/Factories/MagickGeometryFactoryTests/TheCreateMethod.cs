@@ -3,6 +3,7 @@
 
 using System;
 using ImageMagick;
+using ImageMagick.Factories;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -16,7 +17,7 @@ public partial class MagickGeometryFactoryTests
         {
             var factory = new MagickGeometryFactory();
 
-            Assert.Throws<ArgumentNullException>("value", () => factory.Create(null));
+            Assert.Throws<ArgumentNullException>("value", () => factory.Create(null!));
         }
 
         [Fact]
@@ -34,8 +35,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(5, geometry.Width);
-            Assert.Equal(10, geometry.Height);
+            Assert.Equal(5U, geometry.Width);
+            Assert.Equal(10U, geometry.Height);
             Assert.True(geometry.IgnoreAspectRatio);
         }
 
@@ -47,8 +48,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(2, geometry.X);
             Assert.Equal(1, geometry.Y);
-            Assert.Equal(10, geometry.Width);
-            Assert.Equal(5, geometry.Height);
+            Assert.Equal(10U, geometry.Width);
+            Assert.Equal(5U, geometry.Height);
             Assert.True(geometry.Less);
         }
 
@@ -60,8 +61,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(5, geometry.Width);
-            Assert.Equal(10, geometry.Height);
+            Assert.Equal(5U, geometry.Width);
+            Assert.Equal(10U, geometry.Height);
             Assert.True(geometry.Greater);
         }
 
@@ -73,8 +74,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(10, geometry.Width);
-            Assert.Equal(15, geometry.Height);
+            Assert.Equal(10U, geometry.Width);
+            Assert.Equal(15U, geometry.Height);
             Assert.True(geometry.FillArea);
         }
 
@@ -86,8 +87,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(10, geometry.Width);
-            Assert.Equal(0, geometry.Height);
+            Assert.Equal(10U, geometry.Width);
+            Assert.Equal(0U, geometry.Height);
             Assert.True(geometry.LimitPixels);
         }
 
@@ -99,8 +100,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(50, geometry.Width);
-            Assert.Equal(0, geometry.Height);
+            Assert.Equal(50U, geometry.Width);
+            Assert.Equal(0U, geometry.Height);
             Assert.True(geometry.IsPercentage);
             Assert.True(geometry.Greater);
         }
@@ -113,8 +114,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(3, geometry.Width);
-            Assert.Equal(2, geometry.Height);
+            Assert.Equal(3U, geometry.Width);
+            Assert.Equal(2U, geometry.Height);
             Assert.True(geometry.AspectRatio);
         }
 
@@ -126,8 +127,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(2, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(4, geometry.Width);
-            Assert.Equal(3, geometry.Height);
+            Assert.Equal(4U, geometry.Width);
+            Assert.Equal(3U, geometry.Height);
             Assert.True(geometry.AspectRatio);
         }
 
@@ -139,8 +140,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(2, geometry.X);
             Assert.Equal(1, geometry.Y);
-            Assert.Equal(4, geometry.Width);
-            Assert.Equal(3, geometry.Height);
+            Assert.Equal(4U, geometry.Width);
+            Assert.Equal(3U, geometry.Height);
             Assert.True(geometry.AspectRatio);
         }
 
@@ -152,8 +153,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(-2, geometry.X);
             Assert.Equal(1, geometry.Y);
-            Assert.Equal(4, geometry.Width);
-            Assert.Equal(3, geometry.Height);
+            Assert.Equal(4U, geometry.Width);
+            Assert.Equal(3U, geometry.Height);
             Assert.True(geometry.AspectRatio);
         }
 
@@ -165,8 +166,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(5, geometry.Width);
-            Assert.Equal(5, geometry.Height);
+            Assert.Equal(5U, geometry.Width);
+            Assert.Equal(5U, geometry.Height);
         }
 
         [Fact]
@@ -177,8 +178,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(5, geometry.Width);
-            Assert.Equal(10, geometry.Height);
+            Assert.Equal(5U, geometry.Width);
+            Assert.Equal(10U, geometry.Height);
         }
 
         [Fact]
@@ -189,8 +190,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(5, geometry.X);
             Assert.Equal(10, geometry.Y);
-            Assert.Equal(15, geometry.Width);
-            Assert.Equal(20, geometry.Height);
+            Assert.Equal(15U, geometry.Width);
+            Assert.Equal(20U, geometry.Height);
         }
 
         [Fact]
@@ -201,8 +202,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(50, geometry.Width);
-            Assert.Equal(10, geometry.Height);
+            Assert.Equal(50U, geometry.Width);
+            Assert.Equal(10U, geometry.Height);
             Assert.True(geometry.IsPercentage);
         }
 
@@ -214,8 +215,8 @@ public partial class MagickGeometryFactoryTests
 
             Assert.Equal(5, geometry.X);
             Assert.Equal(10, geometry.Y);
-            Assert.Equal(15, geometry.Width);
-            Assert.Equal(20, geometry.Height);
+            Assert.Equal(15U, geometry.Width);
+            Assert.Equal(20U, geometry.Height);
             Assert.True(geometry.IsPercentage);
         }
     }

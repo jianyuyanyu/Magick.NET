@@ -4,7 +4,7 @@
 namespace ImageMagick;
 
 /// <summary>
-/// Encapsulation of the ImageMagick ImageChannelStatistics object.
+/// Encapsulation of the ImageMagick cannel statistics object.
 /// </summary>
 public interface IChannelStatistics
 {
@@ -16,7 +16,7 @@ public interface IChannelStatistics
     /// <summary>
     /// Gets the depth of the channel.
     /// </summary>
-    int Depth { get; }
+    uint Depth { get; }
 
     /// <summary>
     /// Gets the entropy.

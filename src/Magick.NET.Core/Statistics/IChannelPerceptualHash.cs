@@ -4,7 +4,7 @@
 namespace ImageMagick;
 
 /// <summary>
-/// Contains the he perceptual hash of one image channel.
+/// Contains the perceptual hash of one image channel.
 /// </summary>
 public interface IChannelPerceptualHash
 {
@@ -14,18 +14,12 @@ public interface IChannelPerceptualHash
     PixelChannel Channel { get; }
 
     /// <summary>
-    /// SRGB hu perceptual hash.
+    /// Returns the hu perceptual hash for the specified colorspace.
     /// </summary>
+    /// <param name="colorSpace">The colorspace to use.</param>
     /// <param name="index">The index to use.</param>
-    /// <returns>The SRGB hu perceptual hash.</returns>
-    double SrgbHuPhash(int index);
-
-    /// <summary>
-    /// Hclp hu perceptual hash.
-    /// </summary>
-    /// <param name="index">The index to use.</param>
-    /// <returns>The Hclp hu perceptual hash.</returns>
-    double HclpHuPhash(int index);
+    /// <returns>The hu perceptual hash for the specified colorspace.</returns>
+    double HuPhash(ColorSpace colorSpace, int index);
 
     /// <summary>
     /// Returns the sum squared difference between this hash and the other hash.

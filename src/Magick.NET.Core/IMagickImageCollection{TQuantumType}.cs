@@ -95,6 +95,7 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     IMagickImage<TQuantumType> Evaluate(EvaluateOperator evaluateOperator);
 
     /// <summary>
+    /// Flatten this collection into a single image.
     /// Use the virtual canvas size of first image. Images which fall outside this canvas is clipped.
     /// This can be used to 'fill out' a given virtual canvas.
     /// </summary>
@@ -112,19 +113,21 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     IMagickImage<TQuantumType> Flatten(IMagickColor<TQuantumType> backgroundColor);
 
     /// <summary>
-    /// Remap image colors with closest color from reference image.
+    /// Applies a mathematical expression to the images and returns the result.
     /// </summary>
-    /// <param name="image">The image to use.</param>
+    /// <param name="expression">The expression to apply.</param>
+    /// <returns>The resulting image of the fx operation.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Map(IMagickImage<TQuantumType> image);
+    IMagickImage<TQuantumType> Fx(string expression);
 
     /// <summary>
-    /// Remap image colors with closest color from reference image.
+    /// Applies a mathematical expression to the images and returns the result.
     /// </summary>
-    /// <param name="image">The image to use.</param>
-    /// <param name="settings">Quantize settings.</param>
+    /// <param name="expression">The expression to apply.</param>
+    /// <param name="channels">The channel(s) to apply the expression to.</param>
+    /// <returns>The resulting image of the fx operation.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Map(IMagickImage<TQuantumType> image, IQuantizeSettings settings);
+    IMagickImage<TQuantumType> Fx(string expression, Channels channels);
 
     /// <summary>
     /// Merge all layers onto a canvas just large enough to hold all the actual images. The virtual
@@ -158,7 +161,7 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="readSettings">The settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Ping(byte[] data, int offset, int count, IMagickReadSettings<TQuantumType>? readSettings);
+    void Ping(byte[] data, uint offset, uint count, IMagickReadSettings<TQuantumType>? readSettings);
 
     /// <summary>
     /// Read only metadata and not the pixel data from all image frames.
@@ -209,7 +212,7 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="readSettings">The settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(byte[] data, int offset, int count, IMagickReadSettings<TQuantumType>? readSettings);
+    void Read(byte[] data, uint offset, uint count, IMagickReadSettings<TQuantumType>? readSettings);
 
     /// <summary>
     /// Read all image frames.
@@ -306,7 +309,7 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     /// <param name="offset">Minimum distance in pixels between images.</param>
     /// <returns>The resulting image of the smush operation.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickImage<TQuantumType> SmushHorizontal(int offset);
+    IMagickImage<TQuantumType> SmushHorizontal(uint offset);
 
     /// <summary>
     /// Smush images from list into single image in vertical direction.
@@ -314,5 +317,5 @@ public partial interface IMagickImageCollection<TQuantumType> : IMagickImageColl
     /// <param name="offset">Minimum distance in pixels between images.</param>
     /// <returns>The resulting image of the smush operation.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickImage<TQuantumType> SmushVertical(int offset);
+    IMagickImage<TQuantumType> SmushVertical(uint offset);
 }

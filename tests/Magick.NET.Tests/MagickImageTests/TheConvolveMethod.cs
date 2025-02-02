@@ -16,7 +16,7 @@ public partial class MagickImageTests
         {
             using var image = new MagickImage();
 
-            Assert.Throws<ArgumentNullException>("matrix", () => image.Convolve(null));
+            Assert.Throws<ArgumentNullException>("matrix", () => image.Convolve(null!));
         }
 
         [Fact]
@@ -26,8 +26,8 @@ public partial class MagickImageTests
             image.BorderColor = MagickColors.Black;
             image.Border(5);
 
-            Assert.Equal(11, image.Width);
-            Assert.Equal(11, image.Height);
+            Assert.Equal(11U, image.Width);
+            Assert.Equal(11U, image.Height);
 
             var matrix = new ConvolveMatrix(3, 0, 0.5, 0, 0.5, 1, 0.5, 0, 0.5, 0);
             image.Convolve(matrix);

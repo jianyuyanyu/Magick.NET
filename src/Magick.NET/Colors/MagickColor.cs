@@ -34,7 +34,7 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
     /// <param name="color">The color to use.</param>
     public MagickColor(IMagickColor<QuantumType> color)
     {
-        Throw.IfNull(nameof(color), color);
+        Throw.IfNull(color);
 
         R = color.R;
         G = color.G;
@@ -119,7 +119,7 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
     /// For example: #F000, #FF000000, #FFFF000000000000.</param>
     public MagickColor(string color)
     {
-        Throw.IfNullOrEmpty(nameof(color), color);
+        Throw.IfNullOrEmpty(color);
 
         if (color.Equals("transparent", StringComparison.OrdinalIgnoreCase))
         {
@@ -133,13 +133,13 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
             return;
         }
 
-        using var instance = new NativeMagickColor();
-        Throw.IfFalse(nameof(color), instance.Initialize(color), "Invalid color specified");
+        using var instance = NativeMagickColor.Create();
+        Throw.IfFalse(instance.Initialize(color), nameof(color), "Invalid color specified");
         Initialize(instance);
     }
 
-    private MagickColor(NativeMagickColor instance)
-        => Initialize(instance);
+    private MagickColor(NativeMagickColor nativeInstance)
+        => Initialize(nativeInstance);
 
     /// <summary>
     /// Gets or sets the alpha component value of this color.
@@ -257,7 +257,7 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
         if (!color.IsCmyk)
             return new MagickColor(red, green, blue, color.A);
 
-        var key = (QuantumType)percentage.Multiply((double)color.K);
+        var key = Quantum.Convert(percentage.Multiply((double)color.K));
 
         return new MagickColor(red, green, blue, key, color.A);
     }
@@ -381,7 +381,7 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
             return true;
 
         using var instance = CreateNativeInstance(this);
-        return instance.FuzzyEquals(other, PercentageHelper.ToQuantumType(fuzz));
+        return instance.FuzzyEquals(other, PercentageHelper.ToQuantumType(nameof(fuzz), fuzz));
     }
 
     /// <summary>
@@ -423,9 +423,9 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
     public byte[] ToByteArray()
     {
         if (IsCmyk)
-            return new[] { Quantum.ScaleToByte(R), Quantum.ScaleToByte(G), Quantum.ScaleToByte(B), Quantum.ScaleToByte(K), Quantum.ScaleToByte(A) };
+            return [Quantum.ScaleToByte(R), Quantum.ScaleToByte(G), Quantum.ScaleToByte(B), Quantum.ScaleToByte(K), Quantum.ScaleToByte(A)];
         else
-            return new[] { Quantum.ScaleToByte(R), Quantum.ScaleToByte(G), Quantum.ScaleToByte(B), Quantum.ScaleToByte(A) };
+            return [Quantum.ScaleToByte(R), Quantum.ScaleToByte(G), Quantum.ScaleToByte(B), Quantum.ScaleToByte(A)];
     }
 
     /// <summary>
@@ -513,41 +513,6 @@ public sealed partial class MagickColor : IMagickColor<QuantumType>
             K = value.K,
             IsCmyk = value.IsCmyk,
         };
-    }
-
-    internal static IMagickColor<QuantumType>? CreateInstance(IntPtr instance, out int count)
-    {
-        count = 0;
-        if (instance == IntPtr.Zero)
-            return null;
-
-        using var nativeInstance = new NativeMagickColor(instance);
-        count = (int)nativeInstance.Count;
-        return new MagickColor(nativeInstance);
-    }
-
-    private static NativeMagickColor CreateNativeInstance(IMagickColor<QuantumType> instance)
-    {
-        return new NativeMagickColor
-        {
-            Red = instance.R,
-            Green = instance.G,
-            Blue = instance.B,
-            Alpha = instance.A,
-            Black = instance.K,
-            IsCMYK = instance.IsCmyk,
-        };
-    }
-
-    private void Initialize(NativeMagickColor instance)
-    {
-        R = instance.Red;
-        G = instance.Green;
-        B = instance.Blue;
-        A = instance.Alpha;
-        K = instance.Black;
-
-        IsCmyk = instance.IsCMYK;
     }
 
     private void Initialize(QuantumType red, QuantumType green, QuantumType blue, QuantumType alpha)

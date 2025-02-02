@@ -1,0 +1,11 @@
+<Project>  
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)../Magick.NET.Internal.ruleset" Link="Magick.NET.Internal.ruleset" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)../Magick.NET.Internal.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <Import Project="../Magick.NET.props" />
+</Project>

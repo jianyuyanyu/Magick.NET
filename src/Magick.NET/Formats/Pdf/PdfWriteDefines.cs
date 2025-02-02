@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace ImageMagick.Formats;
 
@@ -43,6 +44,11 @@ public sealed class PdfWriteDefines : IWriteDefines
     public DateTime? ModificationTime { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether an identifier should be written (pdf:no-identifier).
+    /// </summary>
+    public bool? NoIdentifier { get; set; }
+
+    /// <summary>
     /// Gets or sets the producer of the pdf document (pdf:producer).
     /// </summary>
     public string? Producer { get; set; }
@@ -53,9 +59,19 @@ public sealed class PdfWriteDefines : IWriteDefines
     public string? Subject { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether a thumbnail should be added to the pdf document (pdf:thumbnail).
+    /// </summary>
+    public bool? Thumbnail { get; set; }
+
+    /// <summary>
     /// Gets or sets the title of the pdf document (pdf:title).
     /// </summary>
     public string? Title { get; set; }
+
+    /// <summary>
+    /// Gets or sets the version of the pdf document, for example 1.4 or 1.7 (pdf:version).
+    /// </summary>
+    public double? Version { get; set; }
 
     /// <summary>
     /// Gets the defines that should be set as a define on an image.
@@ -79,11 +95,20 @@ public sealed class PdfWriteDefines : IWriteDefines
             if (ModificationTime is not null)
                 yield return new MagickDefine(Format, "modify-epoch", ToUnixTimeSeconds(ModificationTime.Value));
 
+            if (NoIdentifier == true)
+                yield return new MagickDefine(Format, "no-identifier", NoIdentifier.Value);
+
             if (Producer?.Length > 0)
                 yield return new MagickDefine(Format, "producer", Producer);
 
             if (Subject?.Length > 0)
                 yield return new MagickDefine(Format, "subject", Subject);
+
+            if (Thumbnail.HasValue)
+                yield return new MagickDefine(Format, "thumbnail", Thumbnail.Value);
+
+            if (Version.HasValue)
+                yield return new MagickDefine(Format, "version", Version.Value.ToString(".0", CultureInfo.InvariantCulture));
 
             if (Title?.Length > 0)
                 yield return new MagickDefine(Format, "title", Title);

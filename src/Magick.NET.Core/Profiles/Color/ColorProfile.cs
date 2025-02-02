@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -12,8 +13,8 @@ namespace ImageMagick;
 /// </summary>
 public sealed class ColorProfile : ImageProfile, IColorProfile
 {
-    private static readonly object _SyncRoot = new object();
-    private static readonly Dictionary<string, ColorProfile> _profiles = new Dictionary<string, ColorProfile>();
+    private static readonly object _syncRoot = new object();
+    private static readonly Dictionary<string, ColorProfile> _profiles = [];
 
     private ColorProfileData? _data;
 
@@ -49,6 +50,7 @@ public sealed class ColorProfile : ImageProfile, IColorProfile
     /// </summary>
     /// <param name="name">The name of the color profile (e.g. icc or icm).</param>
     /// <param name="data">A byte array containing the profile.</param>
+    [Obsolete("This constructor will be removed in the next major release (only 'icc' will be used in the future).")]
     public ColorProfile(string name, byte[] data)
       : base(name, data)
     {
@@ -154,7 +156,7 @@ public sealed class ColorProfile : ImageProfile, IColorProfile
     {
         if (!_profiles.ContainsKey(resourceName))
         {
-            lock (_SyncRoot)
+            lock (_syncRoot)
             {
                 if (!_profiles.ContainsKey(resourceName))
                 {

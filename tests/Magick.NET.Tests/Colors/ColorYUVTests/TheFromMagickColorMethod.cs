@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 #if Q8
@@ -23,7 +24,7 @@ public partial class ColorYUVTests
         [Fact]
         public void ShouldReturnNullWhenValueIsNull()
         {
-            var result = ColorHSV.FromMagickColor(null);
+            var result = ColorYUV.FromMagickColor(null!);
 
             Assert.Null(result);
         }
@@ -34,6 +35,7 @@ public partial class ColorYUVTests
             var color = new MagickColor(Quantum.Max, Quantum.Max, (QuantumType)(Quantum.Max * 0.02));
             var hslColor = ColorYUV.FromMagickColor(color);
 
+            Assert.NotNull(hslColor);
             Assert.InRange(hslColor.Y, 0.88, 0.89);
             Assert.InRange(hslColor.U, 0.07, 0.08);
             Assert.InRange(hslColor.V, 0.59, 0.60);

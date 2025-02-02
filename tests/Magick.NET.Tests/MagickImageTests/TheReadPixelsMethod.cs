@@ -30,7 +30,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((byte[])null, settings));
+                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((byte[])null!, settings));
             }
 
             [Fact]
@@ -48,7 +48,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, null));
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, null!));
             }
 
             [Fact]
@@ -113,13 +113,13 @@ public partial class MagickImageTests
                 using var image = new MagickImage();
                 image.ReadPixels(data, settings);
 
-                Assert.Equal(2, image.Width);
-                Assert.Equal(1, image.Height);
+                Assert.Equal(2U, image.Width);
+                Assert.Equal(1U, image.Height);
 
                 using var pixels = image.GetPixels();
                 var pixel = pixels.GetPixel(0, 0);
 
-                Assert.Equal(4, pixel.Channels);
+                Assert.Equal(4U, pixel.Channels);
                 Assert.Equal(0, pixel.GetChannel(0));
                 Assert.Equal(0, pixel.GetChannel(1));
                 Assert.Equal(0, pixel.GetChannel(2));
@@ -127,7 +127,7 @@ public partial class MagickImageTests
 
                 pixel = pixels.GetPixel(1, 0);
 
-                Assert.Equal(4, pixel.Channels);
+                Assert.Equal(4U, pixel.Channels);
                 Assert.Equal(0, pixel.GetChannel(0));
                 Assert.Equal(Quantum.Max, pixel.GetChannel(1));
                 Assert.Equal(0, pixel.GetChannel(2));
@@ -143,7 +143,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((byte[])null, 0, 0, settings));
+                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((byte[])null!, 0, 0, settings));
             }
 
             [Fact]
@@ -161,17 +161,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, null));
-            }
-
-            [Fact]
-            public void ShouldThrowExceptionWhenOffsetIsNegative()
-            {
-                var settings = new PixelReadSettings();
-                using var image = new MagickImage();
-
-                var exception = Assert.Throws<ArgumentException>("offset", () => image.ReadPixels(new byte[] { 215 }, -1, 0, settings));
-                Assert.Contains("The offset should be positive.", exception.Message);
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, null!));
             }
 
             [Fact]
@@ -192,16 +182,6 @@ public partial class MagickImageTests
 
                 var exception = Assert.Throws<ArgumentException>("offset", () => image.ReadPixels(new byte[] { 215 }, 1, 1, settings));
                 Assert.Contains("The offset should not exceed the length of the array.", exception.Message);
-            }
-
-            [Fact]
-            public void ShouldThrowExceptionWhenCountIsNegative()
-            {
-                var settings = new PixelReadSettings();
-                using var image = new MagickImage();
-
-                var exception = Assert.Throws<ArgumentException>("count", () => image.ReadPixels(new byte[] { 215 }, 0, -1, settings));
-                Assert.Contains("The number of bytes should be at least 1.", exception.Message);
             }
 
             [Fact]
@@ -227,7 +207,7 @@ public partial class MagickImageTests
                 };
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((QuantumType[])null, settings));
+                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((QuantumType[])null!, settings));
             }
 
             [Fact]
@@ -248,7 +228,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new QuantumType[] { 215 }, null));
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new QuantumType[] { 215 }, null!));
             }
 
             [Fact]
@@ -306,13 +286,13 @@ public partial class MagickImageTests
                 using var image = new MagickImage();
                 image.ReadPixels(data, settings);
 
-                Assert.Equal(2, image.Width);
-                Assert.Equal(1, image.Height);
+                Assert.Equal(2U, image.Width);
+                Assert.Equal(1U, image.Height);
 
                 using var pixels = image.GetPixels();
                 var pixel = pixels.GetPixel(0, 0);
 
-                Assert.Equal(4, pixel.Channels);
+                Assert.Equal(4U, pixel.Channels);
                 Assert.Equal(0, pixel.GetChannel(0));
                 Assert.Equal(0, pixel.GetChannel(1));
                 Assert.Equal(0, pixel.GetChannel(2));
@@ -320,7 +300,7 @@ public partial class MagickImageTests
 
                 pixel = pixels.GetPixel(1, 0);
 
-                Assert.Equal(4, pixel.Channels);
+                Assert.Equal(4U, pixel.Channels);
                 Assert.Equal(0, pixel.GetChannel(0));
                 Assert.Equal(Quantum.Max, pixel.GetChannel(1));
                 Assert.Equal(0, pixel.GetChannel(2));
@@ -336,7 +316,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((QuantumType[])null, 0, 0, settings));
+                Assert.Throws<ArgumentNullException>("data", () => image.ReadPixels((QuantumType[])null!, 0, 0, settings));
             }
 
             [Fact]
@@ -354,17 +334,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, 0, 1, null));
-            }
-
-            [Fact]
-            public void ShouldThrowExceptionWhenOffsetIsNegative()
-            {
-                var settings = new PixelReadSettings();
-                using var image = new MagickImage();
-
-                var exception = Assert.Throws<ArgumentException>("offset", () => image.ReadPixels(new QuantumType[] { 215 }, -1, 0, settings));
-                Assert.Contains("The offset should be positive.", exception.Message);
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new byte[] { 215 }, 0, 1, null!));
             }
 
             [Fact]
@@ -374,16 +344,6 @@ public partial class MagickImageTests
                 using var image = new MagickImage();
 
                 var exception = Assert.Throws<ArgumentException>("count", () => image.ReadPixels(new QuantumType[] { 215 }, 0, 0, settings));
-                Assert.Contains("The number of items should be at least 1.", exception.Message);
-            }
-
-            [Fact]
-            public void ShouldThrowExceptionWhenCountIsNegative()
-            {
-                var settings = new PixelReadSettings();
-                using var image = new MagickImage();
-
-                var exception = Assert.Throws<ArgumentException>("count", () => image.ReadPixels(new QuantumType[] { 215 }, 0, -1, settings));
                 Assert.Contains("The number of items should be at least 1.", exception.Message);
             }
 
@@ -407,7 +367,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("file", () => image.ReadPixels((FileInfo)null, settings));
+                Assert.Throws<ArgumentNullException>("file", () => image.ReadPixels((FileInfo)null!, settings));
             }
 
             [Fact]
@@ -415,7 +375,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new FileInfo(Files.CirclePNG), null));
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new FileInfo(Files.CirclePNG), null!));
             }
 
             [Fact]
@@ -424,12 +384,12 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings(1, 1, StorageType.Float, "R");
                 var bytes = BitConverter.GetBytes(1.0F);
 
-                using var temporyFile = new TemporaryFile(bytes);
+                using var tempFile = new TemporaryFile(bytes);
                 using var image = new MagickImage();
-                image.ReadPixels(temporyFile.File, settings);
+                image.ReadPixels(tempFile.File, settings);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+                Assert.Equal(1U, image.Width);
+                Assert.Equal(1U, image.Height);
                 ColorAssert.Equal(MagickColors.White, image, 0, 0);
             }
         }
@@ -442,7 +402,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("fileName", () => image.ReadPixels((string)null, settings));
+                Assert.Throws<ArgumentNullException>("fileName", () => image.ReadPixels((string)null!, settings));
             }
 
             [Fact]
@@ -459,13 +419,13 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(Files.CirclePNG, null));
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(Files.CirclePNG, null!));
             }
 
             [Fact]
             public void ShouldThrowExceptionWhenMappingIsNull()
             {
-                var settings = new PixelReadSettings(1, 1, StorageType.Char, null);
+                var settings = new PixelReadSettings(1, 1, StorageType.Char, null!);
                 using var image = new MagickImage();
 
                 var exception = Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(Files.CirclePNG, settings));
@@ -509,12 +469,12 @@ public partial class MagickImageTests
             {
                 var settings = new PixelReadSettings(1, 1, StorageType.Short, "R");
                 var bytes = BitConverter.GetBytes(ushort.MaxValue);
-                using var temporyFile = new TemporaryFile(bytes);
+                using var tempFile = new TemporaryFile(bytes);
                 using var image = new MagickImage();
-                image.ReadPixels(temporyFile.File.FullName, settings);
+                image.ReadPixels(tempFile.File.FullName, settings);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+                Assert.Equal(1U, image.Width);
+                Assert.Equal(1U, image.Height);
                 ColorAssert.Equal(MagickColors.White, image, 0, 0);
             }
         }
@@ -527,7 +487,7 @@ public partial class MagickImageTests
                 var settings = new PixelReadSettings();
                 var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("stream", () => image.ReadPixels((Stream)null, settings));
+                Assert.Throws<ArgumentNullException>("stream", () => image.ReadPixels((Stream)null!, settings));
             }
 
             [Fact]
@@ -544,7 +504,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new MemoryStream(new byte[] { 215 }), null));
+                Assert.Throws<ArgumentNullException>("settings", () => image.ReadPixels(new MemoryStream(new byte[] { 215 }), null!));
             }
 
             [Fact]
@@ -556,8 +516,22 @@ public partial class MagickImageTests
                 using var image = new MagickImage();
                 image.ReadPixels(memoryStream, settings);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+                Assert.Equal(1U, image.Width);
+                Assert.Equal(1U, image.Height);
+                ColorAssert.Equal(MagickColors.White, image, 0, 0);
+            }
+
+            [Fact]
+            public void ShouldReadNonSeekableStream()
+            {
+                var settings = new PixelReadSettings(1, 1, StorageType.Int64, "R");
+                var bytes = BitConverter.GetBytes(ulong.MaxValue);
+                using var memoryStream = new NonSeekableStream(bytes);
+                using var image = new MagickImage();
+                image.ReadPixels(memoryStream, settings);
+
+                Assert.Equal(1U, image.Width);
+                Assert.Equal(1U, image.Height);
                 ColorAssert.Equal(MagickColors.White, image, 0, 0);
             }
         }

@@ -14,12 +14,4 @@ internal partial class OffsetInfo
     public int X { get; }
 
     public int Y { get; }
-
-    public INativeInstance CreateNativeInstance()
-    {
-        var offsetInfo = new NativeOffsetInfo();
-        offsetInfo.SetX(X);
-        offsetInfo.SetY(Y);
-        return offsetInfo;
-    }
 }

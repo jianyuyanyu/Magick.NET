@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using ImageMagick;
 using Xunit;
 
@@ -23,62 +24,73 @@ public partial class MagickImageTests
         {
             using var image = new MagickImage(Files.Builtin.Logo);
 
-            var clone = image.Clone();
+            using var clone = image.Clone();
 
             Assert.Equal(image, clone);
             Assert.False(ReferenceEquals(image, clone));
         }
 
-        [Fact]
-        public void ShouldClonePartOfTheImageWhenWidthAndHeightAreSpecified()
+        [Obsolete]
+        public class WithWidthAndHeight
         {
-            using var icon = new MagickImage(Files.MagickNETIconPNG);
-            using var area = icon.Clone();
-            area.Crop(32, 64, Gravity.Northwest);
+            public void ShouldClonePartOfTheImageWhenWidthAndHeightAreSpecified()
+            {
+                using var icon = new MagickImage(Files.MagickNETIconPNG);
+                using var area = icon.Clone();
+                area.Crop(32, 64, Gravity.Northwest);
 
-            Assert.Equal(32, area.Width);
-            Assert.Equal(64, area.Height);
+                Assert.Equal(32U, area.Width);
+                Assert.Equal(64U, area.Height);
 
-            using var part = icon.Clone(32, 64);
+                using var part = icon.Clone(32, 64);
 
-            Assert.Equal(area.Width, part.Width);
-            Assert.Equal(area.Height, part.Height);
-            Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
-            Assert.Equal(8192, part.ToByteArray(MagickFormat.Rgba).Length);
+                Assert.Equal(area.Width, part.Width);
+                Assert.Equal(area.Height, part.Height);
+                Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
+                Assert.Equal(8192, part.ToByteArray(MagickFormat.Rgba).Length);
+            }
         }
 
-        [Fact]
-        public void ShouldCloneUsingTheSpecifiedOffset()
+        [Obsolete]
+        public class WithWidthAndHeightAndOffset
         {
-            using var icon = new MagickImage(Files.MagickNETIconPNG);
-            using var area = icon.Clone();
-            area.Crop(64, 64, Gravity.Southeast);
-            area.RePage();
-            area.Crop(64, 32, Gravity.North);
+            [Fact]
+            public void ShouldCloneUsingTheSpecifiedOffset()
+            {
+                using var icon = new MagickImage(Files.MagickNETIconPNG);
+                using var area = icon.Clone();
+                area.Crop(64, 64, Gravity.Southeast);
+                area.ResetPage();
+                area.Crop(64, 32, Gravity.North);
 
-            using var part = icon.Clone(64, 64, 64, 32);
+                using var part = icon.Clone(64, 64, 64, 32);
 
-            Assert.Equal(area.Width, part.Width);
-            Assert.Equal(area.Height, part.Height);
+                Assert.Equal(area.Width, part.Width);
+                Assert.Equal(area.Height, part.Height);
 
-            Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
+                Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
+            }
         }
 
-        [Fact]
-        public void ShouldCloneTheSpecifiedGeometry()
+        [Obsolete]
+        public class WithGeometry
         {
-            using var icon = new MagickImage(Files.MagickNETIconPNG);
-            using var area = icon.Clone();
-            area.Crop(64, 64, Gravity.Southeast);
-            area.RePage();
-            area.Crop(64, 32, Gravity.North);
+            [Fact]
+            public void ShouldCloneTheSpecifiedGeometry()
+            {
+                using var icon = new MagickImage(Files.MagickNETIconPNG);
+                using var area = icon.Clone();
+                area.Crop(64, 64, Gravity.Southeast);
+                area.ResetPage();
+                area.Crop(64, 32, Gravity.North);
 
-            using var part = icon.Clone(new MagickGeometry(64, 64, 64, 32));
+                using var part = icon.Clone(new MagickGeometry(64, 64, 64, 32));
 
-            Assert.Equal(area.Width, part.Width);
-            Assert.Equal(area.Height, part.Height);
+                Assert.Equal(area.Width, part.Width);
+                Assert.Equal(area.Height, part.Height);
 
-            Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
+                Assert.Equal(0.0, area.Compare(part, ErrorMetric.RootMeanSquared));
+            }
         }
     }
 }

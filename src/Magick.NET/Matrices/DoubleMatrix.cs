@@ -17,16 +17,16 @@ public abstract partial class DoubleMatrix
     /// </summary>
     /// <param name="order">The order.</param>
     /// <param name="values">The values to initialize the matrix with.</param>
-    protected DoubleMatrix(int order, double[]? values)
+    protected DoubleMatrix(uint order, double[]? values)
     {
-        Throw.IfTrue(nameof(order), order < 1, "Invalid order specified, value has to be at least 1.");
+        Throw.IfTrue(order < 1, nameof(order), "Invalid order specified, value has to be at least 1.");
 
         Order = order;
 
         _values = new double[Order * Order];
         if (values is not null)
         {
-            Throw.IfFalse(nameof(values), (Order * Order) == values.Length, "Invalid number of values specified");
+            Throw.IfFalse((Order * Order) == values.Length, nameof(values), "Invalid number of values specified");
             Array.Copy(values, _values, _values.Length);
         }
     }
@@ -34,7 +34,7 @@ public abstract partial class DoubleMatrix
     /// <summary>
     /// Gets the order of the matrix.
     /// </summary>
-    public int Order { get; }
+    public uint Order { get; }
 
     /// <summary>
     /// Get or set the value at the specified x/y position.
@@ -63,9 +63,9 @@ public abstract partial class DoubleMatrix
     /// <param name="values">The values.</param>
     public void SetColumn(int x, params double[] values)
     {
-        Throw.IfOutOfRange(nameof(x), x, Order);
-        Throw.IfNull(nameof(values), values);
-        Throw.IfTrue(nameof(values), values.Length != Order, "Invalid length");
+        Throw.IfOutOfRange(x, Order);
+        Throw.IfNull(values);
+        Throw.IfTrue(values.Length != Order, nameof(values), "Invalid length");
 
         for (var y = 0; y < Order; y++)
         {
@@ -80,9 +80,9 @@ public abstract partial class DoubleMatrix
     /// <param name="values">The values.</param>
     public void SetRow(int y, params double[] values)
     {
-        Throw.IfOutOfRange(nameof(y), y, Order);
-        Throw.IfNull(nameof(values), values);
-        Throw.IfTrue(nameof(values), values.Length != Order, "Invalid length");
+        Throw.IfOutOfRange(y, Order);
+        Throw.IfNull(values);
+        Throw.IfTrue(values.Length != Order, nameof(values), "Invalid length");
 
         for (var x = 0; x < Order; x++)
         {
@@ -107,13 +107,13 @@ public abstract partial class DoubleMatrix
         => _values;
 
     private static INativeInstance CreateNativeInstance(IDoubleMatrix instance)
-        => new NativeDoubleMatrix(instance.ToArray(), instance.Order);
+        => NativeDoubleMatrix.Create(instance.ToArray(), instance.Order);
 
     private int GetIndex(int x, int y)
     {
-        Throw.IfOutOfRange(nameof(x), x, Order);
-        Throw.IfOutOfRange(nameof(y), y, Order);
+        Throw.IfOutOfRange(x, Order);
+        Throw.IfOutOfRange(y, Order);
 
-        return (y * Order) + x;
+        return (y * (int)Order) + x;
     }
 }

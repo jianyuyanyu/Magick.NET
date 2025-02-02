@@ -18,22 +18,22 @@ public interface IExifProfile : IImageProfile
     /// <summary>
     /// Gets the tags that where found but contained an invalid value.
     /// </summary>
-    IReadOnlyCollection<ExifTag> InvalidTags { get; }
+    IReadOnlyList<ExifTag> InvalidTags { get; }
 
     /// <summary>
     /// Gets the length of the thumbnail data in the <see cref="byte"/> array of the profile.
     /// </summary>
-    int ThumbnailLength { get; }
+    uint ThumbnailLength { get; }
 
     /// <summary>
     /// Gets the offset of the thumbnail in the <see cref="byte"/> array of the profile.
     /// </summary>
-    int ThumbnailOffset { get; }
+    uint ThumbnailOffset { get; }
 
     /// <summary>
     /// Gets the values of this exif profile.
     /// </summary>
-    IReadOnlyCollection<IExifValue> Values { get; }
+    IReadOnlyList<IExifValue> Values { get; }
 
     /// <summary>
     /// Returns the value with the specified tag.

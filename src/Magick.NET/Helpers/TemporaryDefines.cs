@@ -9,10 +9,15 @@ namespace ImageMagick;
 
 internal sealed class TemporaryDefines : IDisposable
 {
-    private readonly MagickImage _image;
+    private readonly INativeMagickImage _image;
     private readonly List<string> _names = new();
 
-    public TemporaryDefines(MagickImage image)
+    public TemporaryDefines(IMagickImage image)
+    {
+        _image = MagickImage.GetNativeImage(image);
+    }
+
+    public TemporaryDefines(INativeMagickImage image)
     {
         _image = image;
     }
@@ -34,10 +39,10 @@ internal sealed class TemporaryDefines : IDisposable
         _image.SetArtifact(name, value);
     }
 
-    public void SetArtifact(string name, bool value)
+    public void SetArtifact(string name, bool flag)
     {
         _names.Add(name);
-        _image.SetArtifact(name, value);
+        _image.SetArtifact(name, flag ? "true" : "false");
     }
 
     public void SetArtifact<TValue>(string name, TValue? value)
@@ -46,9 +51,14 @@ internal sealed class TemporaryDefines : IDisposable
             return;
 
         _names.Add(name);
+
+        string? stringValue;
         if (value is IConvertible convertible)
-            _image.SetArtifact(name, convertible.ToString(CultureInfo.InvariantCulture));
+            stringValue = convertible.ToString(CultureInfo.InvariantCulture);
         else
-            _image.SetArtifact(name, value.ToString());
+            stringValue = value.ToString();
+
+        if (stringValue is not null)
+            _image.SetArtifact(name, stringValue);
     }
 }

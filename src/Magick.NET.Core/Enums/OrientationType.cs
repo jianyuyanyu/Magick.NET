@@ -14,42 +14,42 @@ public enum OrientationType
     Undefined,
 
     /// <summary>
-    /// TopLeft.
+    /// Top left.
     /// </summary>
     TopLeft,
 
     /// <summary>
-    /// TopRight.
+    /// Top right.
     /// </summary>
     TopRight,
 
     /// <summary>
-    /// BottomRight.
+    /// Bottom right.
     /// </summary>
     BottomRight,
 
     /// <summary>
-    /// BottomLeft.
+    /// Bottom left.
     /// </summary>
     BottomLeft,
 
     /// <summary>
-    /// LeftTop.
+    /// Left top.
     /// </summary>
     LeftTop,
 
     /// <summary>
-    /// RightTop.
+    /// Right top.
     /// </summary>
     RightTop,
 
     /// <summary>
-    /// RightBottom.
+    /// Right bottom.
     /// </summary>
     RightBottom,
 
     /// <summary>
-    /// LeftBotom.
+    /// Left bottom.
     /// </summary>
-    LeftBotom,
+    LeftBottom,
 }

@@ -22,7 +22,7 @@ public partial class IptcValueTests
         [Fact]
         public void ShouldReturnEmptyStringWhenValueIsNull()
         {
-            var value = new IptcValue(IptcTag.Caption, (string)null);
+            var value = new IptcValue(IptcTag.Caption, (string?)null!);
 
             Assert.Empty(value.ToString());
         }

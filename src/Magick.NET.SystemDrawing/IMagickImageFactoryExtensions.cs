@@ -4,7 +4,7 @@
 using System;
 using System.Drawing;
 
-namespace ImageMagick;
+namespace ImageMagick.Factories;
 
 /// <summary>
 /// Extension methods for the <see cref="IMagickImageFactory{QuantumType}"/> interface.
@@ -22,7 +22,7 @@ public static class IMagickImageFactoryExtensions
     public static IMagickImage<TQuantumType> Create<TQuantumType>(this IMagickImageFactory<TQuantumType> self, Bitmap bitmap)
         where TQuantumType : struct, IConvertible
     {
-        Throw.IfNull(nameof(self), self);
+        Throw.IfNull(self);
 
         var image = self.Create();
         image.Read(bitmap);

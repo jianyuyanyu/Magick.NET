@@ -6,15 +6,28 @@ using System.Runtime.InteropServices;
 
 namespace ImageMagick;
 
-internal static partial class Runtime
+internal static class Runtime
 {
-    public static bool Is64Bit { get; } = IntPtr.Size == 8;
+    static Runtime()
+    {
+        Architecture = GetArchitecture();
+        Is64Bit = Architecture is Architecture.X64 or Architecture.Arm64;
+        IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    }
 
-    public static bool IsArm64 { get; } = RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
+    public static bool Is64Bit { get; }
 
-    public static bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    public static Architecture Architecture { get; }
 
-    public static bool IsMacOS { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    public static bool IsWindows { get; }
 
-    public static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    private static Architecture GetArchitecture()
+    {
+        var processArchitecture = RuntimeInformation.ProcessArchitecture;
+        return processArchitecture switch
+        {
+            Architecture.X64 or Architecture.Arm64 or Architecture.X86 => processArchitecture,
+            _ => throw new NotSupportedException($"{processArchitecture} is an unsupported architecture, only {nameof(Architecture.X64)}, {nameof(Architecture.Arm64)} and {nameof(Architecture.X86)} are supported."),
+        };
+    }
 }

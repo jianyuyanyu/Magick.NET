@@ -13,7 +13,7 @@ using QuantumType = System.Single;
 #error Not implemented!
 #endif
 
-namespace ImageMagick;
+namespace ImageMagick.Colors;
 
 /// <summary>
 /// Class that represents a CMYK color.
@@ -28,7 +28,7 @@ public sealed class ColorCMYK : ColorBase
     /// <param name="yellow">Yellow component value of this color.</param>
     /// <param name="key">Key (black) component value of this color.</param>
     public ColorCMYK(Percentage cyan, Percentage magenta, Percentage yellow, Percentage key)
-      : base(new MagickColor(PercentageHelper.ToQuantumType(cyan), PercentageHelper.ToQuantumType(magenta), PercentageHelper.ToQuantumType(yellow), PercentageHelper.ToQuantumType(key), Quantum.Max))
+      : base(new MagickColor(PercentageHelper.ToQuantumType(nameof(cyan), cyan), PercentageHelper.ToQuantumType(nameof(magenta), magenta), PercentageHelper.ToQuantumType(nameof(yellow), yellow), PercentageHelper.ToQuantumType(nameof(key), key), Quantum.Max))
     {
     }
 
@@ -41,7 +41,7 @@ public sealed class ColorCMYK : ColorBase
     /// <param name="key">Key (black) component value of this color.</param>
     /// <param name="alpha">Alpha component value of this color.</param>
     public ColorCMYK(Percentage cyan, Percentage magenta, Percentage yellow, Percentage key, Percentage alpha)
-      : base(new MagickColor(PercentageHelper.ToQuantumType(cyan), PercentageHelper.ToQuantumType(magenta), PercentageHelper.ToQuantumType(yellow), PercentageHelper.ToQuantumType(key), PercentageHelper.ToQuantumType(alpha)))
+      : base(new MagickColor(PercentageHelper.ToQuantumType(nameof(cyan), cyan), PercentageHelper.ToQuantumType(nameof(magenta), magenta), PercentageHelper.ToQuantumType(nameof(yellow), yellow), PercentageHelper.ToQuantumType(nameof(key), key), PercentageHelper.ToQuantumType(nameof(alpha), alpha)))
     {
     }
 
@@ -163,7 +163,7 @@ public sealed class ColorCMYK : ColorBase
 
     private static IMagickColor<QuantumType> CreateColor(string color)
     {
-        Throw.IfNullOrEmpty(nameof(color), color);
+        Throw.IfNullOrEmpty(color);
 
         if (color[0] == '#')
         {

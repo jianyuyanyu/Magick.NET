@@ -4,11 +4,12 @@
 using System;
 using System.Drawing;
 using ImageMagick;
+using ImageMagick.Factories;
 using Xunit;
 
 namespace Magick.NET.SystemDrawing.Tests;
 
-public partial class MagickImageFactoryTests
+public partial class IMagickImageFactoryExtensionsTests
 {
     public partial class TheCreateMethod
     {
@@ -16,7 +17,7 @@ public partial class MagickImageFactoryTests
         public void ShouldThrowExceptionWhenBitmapIsNull()
         {
             var factory = new MagickImageFactory();
-            Assert.Throws<ArgumentNullException>("bitmap", () => factory.Create((Bitmap)null));
+            Assert.Throws<ArgumentNullException>("bitmap", () => factory.Create((Bitmap)null!));
         }
 
         [Fact]
@@ -26,8 +27,8 @@ public partial class MagickImageFactoryTests
             using var bitmap = new Bitmap(Files.SnakewarePNG);
             using var image = factory.Create(bitmap);
 
-            Assert.Equal(286, image.Width);
-            Assert.Equal(67, image.Height);
+            Assert.Equal(286U, image.Width);
+            Assert.Equal(67U, image.Height);
             Assert.Equal(MagickFormat.Png, image.Format);
         }
     }

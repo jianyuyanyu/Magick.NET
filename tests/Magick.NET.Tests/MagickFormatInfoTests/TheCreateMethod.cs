@@ -19,7 +19,7 @@ public partial class MagickFormatInfoTests
             [Fact]
             public void ShouldThrowExceptionWhenArrayIsNull()
             {
-                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((byte[])null));
+                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((byte[])null!));
 
                 Assert.Equal("data", exception.ParamName);
             }
@@ -56,7 +56,7 @@ public partial class MagickFormatInfoTests
             [Fact]
             public void ShouldThrowExceptionWhenFileInfoIsNull()
             {
-                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((FileInfo)null));
+                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((FileInfo)null!));
 
                 Assert.Equal("file", exception.ParamName);
             }
@@ -85,7 +85,7 @@ public partial class MagickFormatInfoTests
             [Fact]
             public void ShouldThrowExceptionWhenFileMameIsNull()
             {
-                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((string)null));
+                var exception = Assert.Throws<ArgumentNullException>(() => MagickFormatInfo.Create((string)null!));
 
                 Assert.Equal("fileName", exception.ParamName);
             }
@@ -143,13 +143,13 @@ public partial class MagickFormatInfoTests
 
                 Assert.NotNull(formatInfo);
                 Assert.Equal(MagickFormat.Gradient, formatInfo.Format);
-                Assert.True(formatInfo.CanReadMultithreaded);
-                Assert.True(formatInfo.CanWriteMultithreaded);
                 Assert.Equal("Gradual linear passing from one shade to another", formatInfo.Description);
                 Assert.Null(formatInfo.MimeType);
                 Assert.False(formatInfo.SupportsMultipleFrames);
                 Assert.True(formatInfo.SupportsReading);
+                Assert.True(formatInfo.CanReadMultithreaded);
                 Assert.False(formatInfo.SupportsWriting);
+                Assert.False(formatInfo.CanWriteMultithreaded);
             }
 
             [Fact]

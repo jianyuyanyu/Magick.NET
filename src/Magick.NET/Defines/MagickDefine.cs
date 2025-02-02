@@ -63,7 +63,7 @@ public sealed class MagickDefine : IDefine
     /// <param name="name">The name of the define.</param>
     /// <param name="value">The value of the define.</param>
     public MagickDefine(MagickFormat format, string name, Enum value)
-        : this(format, name, Enum.GetName(value.GetType(), value).ToLowerInvariant())
+        : this(format, name, EnumHelper.GetName(value).ToLowerInvariant())
     {
     }
 
@@ -111,8 +111,8 @@ public sealed class MagickDefine : IDefine
     /// <param name="value">The value of the define.</param>
     public MagickDefine(MagickFormat format, string name, string value)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
-        Throw.IfNullOrEmpty(nameof(value), value);
+        Throw.IfNullOrEmpty(name);
+        Throw.IfNullOrEmpty(value);
 
         Format = format;
         Name = name;
@@ -151,7 +151,11 @@ public sealed class MagickDefine : IDefine
         foreach (var val in value)
         {
             if (val is not null)
-                values.Add(val.ToString());
+            {
+                var stringValue = val.ToString();
+                if (stringValue is not null)
+                    values.Add(stringValue);
+            }
         }
 
         if (values.Count == 0)

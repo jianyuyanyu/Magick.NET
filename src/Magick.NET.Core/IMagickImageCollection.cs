@@ -14,7 +14,7 @@ namespace ImageMagick;
 public partial interface IMagickImageCollection : IDisposable
 {
     /// <summary>
-    /// Event that will we raised when a warning is thrown by ImageMagick.
+    /// Event that will we raised when a warning is raised by ImageMagick.
     /// </summary>
     event EventHandler<WarningEventArgs> Warning;
 
@@ -80,7 +80,7 @@ public partial interface IMagickImageCollection : IDisposable
     /// </summary>
     /// <param name="frames">The number of in-between images to generate.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Morph(int frames);
+    void Morph(uint frames);
 
     /// <summary>
     /// Compares each image the GIF disposed forms of the previous image in the sequence. From
@@ -118,7 +118,7 @@ public partial interface IMagickImageCollection : IDisposable
     /// <param name="offset">The offset at which to begin reading data.</param>
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Ping(byte[] data, int offset, int count);
+    void Ping(byte[] data, uint offset, uint count);
 
     /// <summary>
     /// Read only metadata and not the pixel data from all image frames.
@@ -170,7 +170,7 @@ public partial interface IMagickImageCollection : IDisposable
     /// <param name="offset">The offset at which to begin reading data.</param>
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(byte[] data, int offset, int count);
+    void Read(byte[] data, uint offset, uint count);
 
     /// <summary>
     /// Read all image frames.
@@ -180,7 +180,7 @@ public partial interface IMagickImageCollection : IDisposable
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="format">The format to use.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(byte[] data, int offset, int count, MagickFormat format);
+    void Read(byte[] data, uint offset, uint count, MagickFormat format);
 
     /// <summary>
     /// Read all image frames.
@@ -344,10 +344,25 @@ public partial interface IMagickImageCollection : IDisposable
     Task ReadAsync(string fileName, MagickFormat format, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Remap image colors with closest color from reference image.
+    /// </summary>
+    /// <param name="image">The image to use.</param>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    void Remap(IMagickImage image);
+
+    /// <summary>
+    /// Remap image colors with closest color from reference image.
+    /// </summary>
+    /// <param name="image">The image to use.</param>
+    /// <param name="settings">Quantize settings.</param>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    void Remap(IMagickImage image, IQuantizeSettings settings);
+
+    /// <summary>
     /// Resets the page property of every image in the collection.
     /// </summary>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void RePage();
+    void ResetPage();
 
     /// <summary>
     /// Reverses the order of the images in the collection.
@@ -383,11 +398,18 @@ public partial interface IMagickImageCollection : IDisposable
     string ToBase64();
 
     /// <summary>
-    /// Converts this instance to a base64 string.
+    /// Converts this instance to a base64 <see cref="string"/>.
     /// </summary>
     /// <param name="format">The format to use.</param>
     /// <returns>A base64 <see cref="string"/>.</returns>
     string ToBase64(MagickFormat format);
+
+    /// <summary>
+    /// Converts this instance to a base64 <see cref="string"/>.
+    /// </summary>
+    /// <param name="defines">The defines to set.</param>
+    /// <returns>A base64 <see cref="string"/>.</returns>
+    string ToBase64(IWriteDefines defines);
 
     /// <summary>
     /// Determine the overall bounds of all the image layers just as in <see cref="IMagickImageCollection{TQuantumType}.Merge()"/>,

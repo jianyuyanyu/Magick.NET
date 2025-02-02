@@ -19,10 +19,10 @@ namespace Magick.NET;
 
 internal static class ColorAssert
 {
-    public static void Equal(IMagickColor<QuantumType> expected, IMagickColor<QuantumType> actual)
+    public static void Equal(IMagickColor<QuantumType> expected, IMagickColor<QuantumType>? actual)
         => Equal(expected, actual, null);
 
-    public static void Equal(IMagickColor<QuantumType> expected, IMagickColor<QuantumType> actual, string messageSuffix)
+    public static void Equal(IMagickColor<QuantumType> expected, IMagickColor<QuantumType>? actual, string? messageSuffix)
     {
         Assert.NotNull(actual);
 
@@ -45,11 +45,13 @@ internal static class ColorAssert
         Equal(expected, pixels.GetPixel(x, y), $"at position {x}x{y}");
     }
 
-    public static void NotEqual(IMagickColor<QuantumType> notExpected, IMagickColor<QuantumType> actual)
+    public static void NotEqual(IMagickColor<QuantumType> notExpected, IMagickColor<QuantumType>? actual)
         => NotEqual(notExpected, actual, null);
 
-    public static void NotEqual(IMagickColor<QuantumType> notExpected, IMagickColor<QuantumType> actual, string messageSuffix)
+    public static void NotEqual(IMagickColor<QuantumType> notExpected, IMagickColor<QuantumType>? actual, string? messageSuffix)
     {
+        Assert.NotNull(actual);
+
         if (notExpected.R == actual.R && notExpected.G == actual.G && notExpected.B == actual.B && notExpected.A == actual.A)
             throw new XunitException("Colors are the same (" + actual.ToString() + ")" + messageSuffix);
     }
@@ -69,7 +71,7 @@ internal static class ColorAssert
     private static void Equal(IMagickColor<QuantumType> expected, IPixel<QuantumType> actual, string messageSuffix)
         => Equal(expected, actual.ToColor(), messageSuffix);
 
-    private static void Equal(QuantumType expected, QuantumType actual, IMagickColor<QuantumType> expectedColor, IMagickColor<QuantumType> actualColor, double delta, string channel, string messageSuffix)
+    private static void Equal(QuantumType expected, QuantumType actual, IMagickColor<QuantumType> expectedColor, IMagickColor<QuantumType> actualColor, double delta, string channel, string? messageSuffix)
     {
 #if Q16HDRI
         if (double.IsNaN(actual))

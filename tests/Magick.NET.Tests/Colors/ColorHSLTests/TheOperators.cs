@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -60,7 +61,9 @@ public partial class ColorHSLTests
         [Fact]
         public void ShouldReturnTheCorrectValueWhenCastedFromMagickColor()
         {
-            var actual = (ColorHSL)new MagickColor("#BFFFDFFF9FFFFFFF");
+            var actual = (ColorHSL?)new MagickColor("#BFFFDFFF9FFFFFFF");
+
+            Assert.NotNull(actual);
             Assert.InRange(actual.Hue, 0.24, 0.26);
             Assert.InRange(actual.Saturation, 0.49, 0.51);
             Assert.InRange(actual.Lightness, 0.74, 0.76);

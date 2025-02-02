@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageMagick.Drawing;
 
 namespace ImageMagick;
 
@@ -13,7 +14,7 @@ namespace ImageMagick;
 /// Interface that represents an ImageMagick image.
 /// </summary>
 /// <typeparam name="TQuantumType">The quantum type.</typeparam>
-public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<IMagickImage<TQuantumType>?>
+public partial interface IMagickImage<TQuantumType> : IMagickImageCreateOperations<TQuantumType>, IMagickImage, IComparable<IMagickImage<TQuantumType>?>
     where TQuantumType : struct, IConvertible
 {
     /// <summary>
@@ -43,11 +44,21 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     IMagickImage<TQuantumType> Clone();
 
     /// <summary>
+    /// Creates a clone of the current image and executes the action that can be used
+    /// to mutate the clone. This is more efficient because it prevents an extra copy
+    /// of the image.
+    /// </summary>
+    /// <param name="action">The mutate action to execute on the clone.</param>
+    /// <returns>A clone of the current image.</returns>
+    IMagickImage<TQuantumType> CloneAndMutate(Action<IMagickImageCloneMutator<TQuantumType>> action);
+
+    /// <summary>
     /// Creates a clone of the current image with the specified geometry.
     /// </summary>
     /// <param name="geometry">The area to clone.</param>
     /// <returns>A clone of the current image.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    [Obsolete($"This method will be removed in the next major release, use {nameof(CloneArea)} instead.")]
     IMagickImage<TQuantumType> Clone(IMagickGeometry geometry);
 
     /// <summary>
@@ -56,7 +67,8 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="width">The width of the area to clone.</param>
     /// <param name="height">The height of the area to clone.</param>
     /// <returns>A clone of the current image.</returns>
-    IMagickImage<TQuantumType> Clone(int width, int height);
+    [Obsolete($"This method will be removed in the next major release, use {nameof(CloneArea)} instead.")]
+    IMagickImage<TQuantumType> Clone(uint width, uint height);
 
     /// <summary>
     /// Creates a clone of the current image.
@@ -66,7 +78,34 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="width">The width of the area to clone.</param>
     /// <param name="height">The height of the area to clone.</param>
     /// <returns>A clone of the current image.</returns>
-    IMagickImage<TQuantumType> Clone(int x, int y, int width, int height);
+    [Obsolete($"This method will be removed in the next major release, use {nameof(CloneArea)} instead.")]
+    IMagickImage<TQuantumType> Clone(int x, int y, uint width, uint height);
+
+    /// <summary>
+    /// Creates a clone of the current image with the specified geometry.
+    /// </summary>
+    /// <param name="geometry">The area to clone.</param>
+    /// <returns>A clone of the current image.</returns>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    IMagickImage<TQuantumType> CloneArea(IMagickGeometry geometry);
+
+    /// <summary>
+    /// Creates a clone of the current image.
+    /// </summary>
+    /// <param name="width">The width of the area to clone.</param>
+    /// <param name="height">The height of the area to clone.</param>
+    /// <returns>A clone of the current image.</returns>
+    IMagickImage<TQuantumType> CloneArea(uint width, uint height);
+
+    /// <summary>
+    /// Creates a clone of the current image.
+    /// </summary>
+    /// <param name="x">The X offset from origin.</param>
+    /// <param name="y">The Y offset from origin.</param>
+    /// <param name="width">The width of the area to clone.</param>
+    /// <param name="height">The height of the area to clone.</param>
+    /// <returns>A clone of the current image.</returns>
+    IMagickImage<TQuantumType> CloneArea(int x, int y, uint width, uint height);
 
     /// <summary>
     /// Sets the alpha channel to the specified color.
@@ -74,25 +113,6 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="color">The color to use.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
     void ColorAlpha(IMagickColor<TQuantumType> color);
-
-    /// <summary>
-    /// Colorize image with the specified color, using specified percent alpha.
-    /// </summary>
-    /// <param name="color">The color to use.</param>
-    /// <param name="alpha">The alpha percentage.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Colorize(IMagickColor<TQuantumType> color, Percentage alpha);
-
-    /// <summary>
-    /// Colorize image with the specified color, using specified percent alpha for red, green,
-    /// and blue quantums.
-    /// </summary>
-    /// <param name="color">The color to use.</param>
-    /// <param name="alphaRed">The alpha percentage for red.</param>
-    /// <param name="alphaGreen">The alpha percentage for green.</param>
-    /// <param name="alphaBlue">The alpha percentage for blue.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Colorize(IMagickColor<TQuantumType> color, Percentage alphaRed, Percentage alphaGreen, Percentage alphaBlue);
 
     /// <summary>
     /// Forces all pixels in the color range to white otherwise black.
@@ -105,22 +125,43 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// Returns the distortion based on the specified metric.
     /// </summary>
     /// <param name="image">The other image to compare with this image.</param>
-    /// <param name="settings">The settings to use.</param>
-    /// <param name="difference">The image that will contain the difference.</param>
-    /// <returns>The distortion based on the specified metric.</returns>
+    /// <param name="metric">The metric to use.</param>
+    /// <param name="distortion">The distortion based on the specified metric.</param>
+    /// <returns>The image that contains the difference.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    double Compare(IMagickImage image, ICompareSettings<TQuantumType> settings, IMagickImage difference);
+    IMagickImage<TQuantumType> Compare(IMagickImage image, ErrorMetric metric, out double distortion);
+
+    /// <summary>
+    /// Returns the distortion based on the specified metric.
+    /// </summary>
+    /// <param name="image">The other image to compare with this image.</param>
+    /// <param name="metric">The metric to use.</param>
+    /// <param name="channels">The channel(s) to compare.</param>
+    /// <param name="distortion">The distortion based on the specified metric.</param>
+    /// <returns>The image that contains the difference.</returns>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    IMagickImage<TQuantumType> Compare(IMagickImage image, ErrorMetric metric, Channels channels, out double distortion);
 
     /// <summary>
     /// Returns the distortion based on the specified metric.
     /// </summary>
     /// <param name="image">The other image to compare with this image.</param>
     /// <param name="settings">The settings to use.</param>
-    /// <param name="difference">The image that will contain the difference.</param>
-    /// <param name="channels">The channel(s) to compare.</param>
-    /// <returns>The distortion based on the specified metric.</returns>
+    /// <param name="distortion">The distortion based on the specified metric.</param>
+    /// <returns>The image that contains the difference.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    double Compare(IMagickImage image, ICompareSettings<TQuantumType> settings, IMagickImage difference, Channels channels);
+    IMagickImage<TQuantumType> Compare(IMagickImage image, ICompareSettings<TQuantumType> settings, out double distortion);
+
+    /// <summary>
+    /// Returns the distortion based on the specified metric.
+    /// </summary>
+    /// <param name="image">The other image to compare with this image.</param>
+    /// <param name="settings">The settings to use.</param>
+    /// <param name="channels">The channel(s) to compare.</param>
+    /// <param name="distortion">The distortion based on the specified metric.</param>
+    /// <returns>The image that contains the difference.</returns>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    IMagickImage<TQuantumType> Compare(IMagickImage image, ICompareSettings<TQuantumType> settings, Channels channels, out double distortion);
 
     /// <summary>
     /// Determines the connected-components of the image.
@@ -128,7 +169,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="connectivity">How many neighbors to visit, choose from 4 or 8.</param>
     /// <returns>The connected-components of the image.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IReadOnlyCollection<IConnectedComponent<TQuantumType>> ConnectedComponents(int connectivity);
+    IReadOnlyList<IConnectedComponent<TQuantumType>> ConnectedComponents(uint connectivity);
 
     /// <summary>
     /// Determines the connected-components of the image.
@@ -136,7 +177,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="settings">The settings for this operation.</param>
     /// <returns>The connected-components of the image.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IReadOnlyCollection<IConnectedComponent<TQuantumType>> ConnectedComponents(IConnectedComponentsSettings settings);
+    IReadOnlyList<IConnectedComponent<TQuantumType>> ConnectedComponents(IConnectedComponentsSettings settings);
 
     /// <summary>
     /// Creates tiles of the current image in the specified dimension.
@@ -144,14 +185,14 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="width">The width of the tile.</param>
     /// <param name="height">The height of the tile.</param>
     /// <returns>New title of the current image.</returns>
-    IReadOnlyCollection<IMagickImage<TQuantumType>> CropToTiles(int width, int height);
+    IReadOnlyList<IMagickImage<TQuantumType>> CropToTiles(uint width, uint height);
 
     /// <summary>
     /// Creates tiles of the current image in the specified dimension.
     /// </summary>
     /// <param name="geometry">The size of the tile.</param>
     /// <returns>New title of the current image.</returns>
-    IReadOnlyCollection<IMagickImage<TQuantumType>> CropToTiles(IMagickGeometry geometry);
+    IReadOnlyList<IMagickImage<TQuantumType>> CropToTiles(IMagickGeometry geometry);
 
     /// <summary>
     /// Draw on image using one or more drawables.
@@ -159,42 +200,6 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="drawables">The drawable(s) to draw on the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
     void Draw(IDrawables<TQuantumType> drawables);
-
-    /// <summary>
-    /// Extend the image as defined by the width and height.
-    /// </summary>
-    /// <param name="width">The width to extend the image to.</param>
-    /// <param name="height">The height to extend the image to.</param>
-    /// <param name="backgroundColor">The background color to use.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Extent(int width, int height, IMagickColor<TQuantumType> backgroundColor);
-
-    /// <summary>
-    /// Extend the image as defined by the width and height.
-    /// </summary>
-    /// <param name="width">The width to extend the image to.</param>
-    /// <param name="height">The height to extend the image to.</param>
-    /// <param name="gravity">The placement gravity.</param>
-    /// <param name="backgroundColor">The background color to use.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Extent(int width, int height, Gravity gravity, IMagickColor<TQuantumType> backgroundColor);
-
-    /// <summary>
-    /// Extend the image as defined by the geometry.
-    /// </summary>
-    /// <param name="geometry">The geometry to extend the image to.</param>
-    /// <param name="backgroundColor">The background color to use.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Extent(IMagickGeometry geometry, IMagickColor<TQuantumType> backgroundColor);
-
-    /// <summary>
-    /// Extend the image as defined by the geometry.
-    /// </summary>
-    /// <param name="geometry">The geometry to extend the image to.</param>
-    /// <param name="gravity">The placement gravity.</param>
-    /// <param name="backgroundColor">The background color to use.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Extent(IMagickGeometry geometry, Gravity gravity, IMagickColor<TQuantumType> backgroundColor);
 
     /// <summary>
     /// Floodfill pixels matching color (within fuzz factor) of target pixel(x,y) with replacement
@@ -207,7 +212,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     void FloodFill(TQuantumType alpha, int x, int y);
 
     /// <summary>
-    /// Flood-fill color across pixels that match the color of the  target pixel and are neighbors
+    /// Flood-fill color across pixels that match the color of the target pixel and are neighbors
     /// of the target pixel. Uses current fuzz setting when determining color match.
     /// </summary>
     /// <param name="color">The color to use.</param>
@@ -290,7 +295,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// </summary>
     /// <returns>A color histogram.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IReadOnlyDictionary<IMagickColor<TQuantumType>, int> Histogram();
+    IReadOnlyDictionary<IMagickColor<TQuantumType>, uint> Histogram();
 
 #if !Q8
     /// <summary>
@@ -308,7 +313,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="offset">The offset at which to begin reading data.</param>
     /// <param name="settings">The import settings to use when importing the pixels.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void ImportPixels(TQuantumType[] data, int offset, IPixelImportSettings settings);
+    void ImportPixels(TQuantumType[] data, uint offset, IPixelImportSettings settings);
 #endif
 
     /// <summary>
@@ -398,9 +403,9 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// </summary>
     /// <param name="blackPoint">The darkest color in the image. Colors darker are set to zero.</param>
     /// <param name="whitePoint">The lightest color in the image. Colors brighter are set to the maximum quantum value.</param>
-    /// <param name="midpoint">The gamma correction to apply to the image. (Useful range of 0 to 10).</param>
+    /// <param name="gamma">The gamma correction to apply to the image. (Useful range of 0 to 10).</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void InverseLevel(TQuantumType blackPoint, TQuantumType whitePoint, double midpoint);
+    void InverseLevel(TQuantumType blackPoint, TQuantumType whitePoint, double gamma);
 
     /// <summary>
     /// Applies the reversed level operation to just the specific channels specified. It compresses
@@ -409,10 +414,10 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// </summary>
     /// <param name="blackPoint">The darkest color in the image. Colors darker are set to zero.</param>
     /// <param name="whitePoint">The lightest color in the image. Colors brighter are set to the maximum quantum value.</param>
-    /// <param name="midpoint">The gamma correction to apply to the image. (Useful range of 0 to 10).</param>
+    /// <param name="gamma">The gamma correction to apply to the image. (Useful range of 0 to 10).</param>
     /// <param name="channels">The channel(s) to level.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void InverseLevel(TQuantumType blackPoint, TQuantumType whitePoint, double midpoint, Channels channels);
+    void InverseLevel(TQuantumType blackPoint, TQuantumType whitePoint, double gamma, Channels channels);
 
     /// <summary>
     /// Maps the given color to "black" and "white" values, linearly spreading out the colors, and
@@ -521,23 +526,6 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     void LevelColors(IMagickColor<TQuantumType> blackColor, IMagickColor<TQuantumType> whiteColor, Channels channels);
 
     /// <summary>
-    /// Remap image colors with closest color from the specified colors.
-    /// </summary>
-    /// <param name="colors">The colors to use.</param>
-    /// <returns>The error informaton.</returns>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickErrorInfo Map(IEnumerable<IMagickColor<TQuantumType>> colors);
-
-    /// <summary>
-    /// Remap image colors with closest color from the specified colors.
-    /// </summary>
-    /// <param name="colors">The colors to use.</param>
-    /// <param name="settings">Quantize settings.</param>
-    /// <returns>The error informaton.</returns>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickErrorInfo Map(IEnumerable<IMagickColor<TQuantumType>> colors, IQuantizeSettings settings);
-
-    /// <summary>
     /// Changes any pixel that matches target with the color defined by fill.
     /// </summary>
     /// <param name="target">The color to replace.</param>
@@ -553,7 +541,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="readSettings">The settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Ping(byte[] data, int offset, int count, IMagickReadSettings<TQuantumType>? readSettings);
+    void Ping(byte[] data, uint offset, uint count, IMagickReadSettings<TQuantumType>? readSettings);
 
     /// <summary>
     /// Reads only metadata and not the pixel data.
@@ -624,7 +612,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="readSettings">The settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(byte[] data, int offset, int count, IMagickReadSettings<TQuantumType>? readSettings);
+    void Read(byte[] data, uint offset, uint count, IMagickReadSettings<TQuantumType>? readSettings);
 
     /// <summary>
     /// Read single image frame.
@@ -649,7 +637,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="width">The width.</param>
     /// <param name="height">The height.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(IMagickColor<TQuantumType> color, int width, int height);
+    void Read(IMagickColor<TQuantumType> color, uint width, uint height);
 
     /// <summary>
     /// Read single image frame.
@@ -740,7 +728,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="settings">The pixel settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void ReadPixels(byte[] data, int offset, int count, IPixelReadSettings<TQuantumType> settings);
+    void ReadPixels(byte[] data, uint offset, uint count, IPixelReadSettings<TQuantumType> settings);
 
 #if !Q8
     /// <summary>
@@ -759,7 +747,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="count">The maximum number of items to read.</param>
     /// <param name="settings">The pixel settings to use when reading the image.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void ReadPixels(TQuantumType[] data, int offset, int count, IPixelReadSettings<TQuantumType> settings);
+    void ReadPixels(TQuantumType[] data, uint offset, uint count, IPixelReadSettings<TQuantumType> settings);
 #endif
 
     /// <summary>
@@ -844,11 +832,28 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     Task ReadPixelsAsync(string fileName, IPixelReadSettings<TQuantumType> settings, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Remap image colors with closest color from the specified colors.
+    /// </summary>
+    /// <param name="colors">The colors to use.</param>
+    /// <returns>The error informaton.</returns>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    IMagickErrorInfo Remap(IEnumerable<IMagickColor<TQuantumType>> colors);
+
+    /// <summary>
+    /// Remap image colors with closest color from the specified colors.
+    /// </summary>
+    /// <param name="colors">The colors to use.</param>
+    /// <param name="settings">Quantize settings.</param>
+    /// <returns>The error informaton.</returns>
+    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
+    IMagickErrorInfo Remap(IEnumerable<IMagickColor<TQuantumType>> colors, IQuantizeSettings settings);
+
+    /// <summary>
     /// Separates the channels from the image and returns it as grayscale images.
     /// </summary>
     /// <returns>The channels from the image as grayscale images.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IReadOnlyCollection<IMagickImage<TQuantumType>> Separate();
+    IReadOnlyList<IMagickImage<TQuantumType>> Separate();
 
     /// <summary>
     /// Separates the specified channels from the image and returns it as grayscale images.
@@ -856,7 +861,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="channels">The channel(s) to separates.</param>
     /// <returns>The channels from the image as grayscale images.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IReadOnlyCollection<IMagickImage<TQuantumType>> Separate(Channels channels);
+    IReadOnlyList<IMagickImage<TQuantumType>> Separate(Channels channels);
 
     /// <summary>
     /// Set color at colormap position index.
@@ -867,62 +872,6 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     void SetColormapColor(int index, IMagickColor<TQuantumType> color);
 
     /// <summary>
-    /// Simulate an image shadow.
-    /// </summary>
-    /// <param name="color">The color of the shadow.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Shadow(IMagickColor<TQuantumType> color);
-
-    /// <summary>
-    /// Simulate an image shadow.
-    /// </summary>
-    /// <param name="x ">the shadow x-offset.</param>
-    /// <param name="y">the shadow y-offset.</param>
-    /// <param name="sigma">The standard deviation of the Gaussian, in pixels.</param>
-    /// <param name="alpha">Transparency percentage.</param>
-    /// <param name="color">The color of the shadow.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Shadow(int x, int y, double sigma, Percentage alpha, IMagickColor<TQuantumType> color);
-
-    /// <summary>
-    /// Sparse color image, given a set of coordinates, interpolates the colors found at those
-    /// coordinates, across the whole image, using various methods.
-    /// </summary>
-    /// <param name="method">The sparse color method to use.</param>
-    /// <param name="args">The sparse color arguments.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void SparseColor(SparseColorMethod method, IEnumerable<ISparseColorArg<TQuantumType>> args);
-
-    /// <summary>
-    /// Sparse color image, given a set of coordinates, interpolates the colors found at those
-    /// coordinates, across the whole image, using various methods.
-    /// </summary>
-    /// <param name="method">The sparse color method to use.</param>
-    /// <param name="args">The sparse color arguments.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void SparseColor(SparseColorMethod method, params ISparseColorArg<TQuantumType>[] args);
-
-    /// <summary>
-    /// Sparse color image, given a set of coordinates, interpolates the colors found at those
-    /// coordinates, across the whole image, using various methods.
-    /// </summary>
-    /// <param name="channels">The channel(s) to use.</param>
-    /// <param name="method">The sparse color method to use.</param>
-    /// <param name="args">The sparse color arguments.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void SparseColor(Channels channels, SparseColorMethod method, IEnumerable<ISparseColorArg<TQuantumType>> args);
-
-    /// <summary>
-    /// Sparse color image, given a set of coordinates, interpolates the colors found at those
-    /// coordinates, across the whole image, using various methods.
-    /// </summary>
-    /// <param name="channels">The channel(s) to use.</param>
-    /// <param name="method">The sparse color method to use.</param>
-    /// <param name="args">The sparse color arguments.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void SparseColor(Channels channels, SparseColorMethod method, params ISparseColorArg<TQuantumType>[] args);
-
-    /// <summary>
     /// Search for the specified image at EVERY possible location in this image. This is slow!
     /// very very slow.. It returns a similarity image such that an exact match location is
     /// completely white and if none of the pixels match, black, otherwise some gray level in-between.
@@ -930,7 +879,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="image">The image to search for.</param>
     /// <returns>The result of the search action.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickSearchResult<TQuantumType> SubImageSearch(IMagickImage<TQuantumType> image);
+    IMagickSearchResult<TQuantumType>? SubImageSearch(IMagickImage<TQuantumType> image);
 
     /// <summary>
     /// Search for the specified image at EVERY possible location in this image. This is slow!
@@ -941,7 +890,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="metric">The metric to use.</param>
     /// <returns>The result of the search action.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickSearchResult<TQuantumType> SubImageSearch(IMagickImage<TQuantumType> image, ErrorMetric metric);
+    IMagickSearchResult<TQuantumType>? SubImageSearch(IMagickImage<TQuantumType> image, ErrorMetric metric);
 
     /// <summary>
     /// Search for the specified image at EVERY possible location in this image. This is slow!
@@ -953,17 +902,7 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <param name="similarityThreshold">Minimum distortion for (sub)image match.</param>
     /// <returns>The result of the search action.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    IMagickSearchResult<TQuantumType> SubImageSearch(IMagickImage<TQuantumType> image, ErrorMetric metric, double similarityThreshold);
-
-    /// <summary>
-    /// Applies a color vector to each pixel in the image. The length of the vector is 0 for black
-    /// and white and at its maximum for the midtones. The vector weighting function is
-    /// f(x)=(1-(4.0*((x-0.5)*(x-0.5)))).
-    /// </summary>
-    /// <param name="opacity">An opacity value used for tinting.</param>
-    /// <param name="color">A color value used for tinting.</param>
-    /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Tint(IMagickGeometry opacity, IMagickColor<TQuantumType> color);
+    IMagickSearchResult<TQuantumType>? SubImageSearch(IMagickImage<TQuantumType> image, ErrorMetric metric, double similarityThreshold);
 
     /// <summary>
     /// Add alpha channel to image, setting pixels matching color to transparent.
@@ -987,17 +926,4 @@ public partial interface IMagickImage<TQuantumType> : IMagickImage, IComparable<
     /// <returns>The unique colors of an image.</returns>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
     IMagickImage<TQuantumType>? UniqueColors();
-
-    /// <summary>
-    /// Removes noise from the image using a wavelet transform.
-    /// </summary>
-    /// <param name="threshold">The threshold for smoothing.</param>
-    void WaveletDenoise(TQuantumType threshold);
-
-    /// <summary>
-    /// Removes noise from the image using a wavelet transform.
-    /// </summary>
-    /// <param name="threshold">The threshold for smoothing.</param>
-    /// <param name="softness">Attenuate the smoothing threshold.</param>
-    void WaveletDenoise(TQuantumType threshold, double softness);
 }

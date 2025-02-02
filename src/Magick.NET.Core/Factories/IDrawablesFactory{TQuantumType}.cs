@@ -2,8 +2,9 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
+using ImageMagick.Drawing;
 
-namespace ImageMagick;
+namespace ImageMagick.Factories;
 
 /// <summary>
 /// Class that can be used to create <see cref="IMagickColor{TQuantumType}"/> instances.

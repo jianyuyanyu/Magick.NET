@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Drawing;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -15,7 +16,7 @@ public partial class MagickSettingsTests
         {
             using var image = new MagickImage();
 
-            Assert.Equal(10, image.Settings.StrokeMiterLimit);
+            Assert.Equal(10U, image.Settings.StrokeMiterLimit);
         }
 
         [Fact]

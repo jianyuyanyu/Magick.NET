@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -30,13 +31,17 @@ public sealed class XmpProfile : ImageProfile, IXmpProfile
     public XmpProfile(IXPathNavigable document)
       : base("xmp")
     {
-        Throw.IfNull(nameof(document), document);
+        Throw.IfNull(document);
 
-        using var memStream = new MemoryStream();
-        using var writer = XmlWriter.Create(memStream);
-        document.CreateNavigator().WriteSubtree(writer);
-        writer.Flush();
-        SetData(memStream.ToArray());
+        var navigator = document.CreateNavigator();
+        if (navigator is not null)
+        {
+            using var memStream = new MemoryStream();
+            using var writer = CreateXmlWriter(memStream);
+            navigator.WriteSubtree(writer);
+            writer.Flush();
+            SetData(memStream.ToArray());
+        }
     }
 
     /// <summary>
@@ -46,10 +51,10 @@ public sealed class XmpProfile : ImageProfile, IXmpProfile
     public XmpProfile(XDocument document)
       : base("xmp")
     {
-        Throw.IfNull(nameof(document), document);
+        Throw.IfNull(document);
 
         using var memStream = new MemoryStream();
-        using var writer = XmlWriter.Create(memStream);
+        using var writer = CreateXmlWriter(memStream);
         document.WriteTo(writer);
         writer.Flush();
         SetData(memStream.ToArray());
@@ -110,9 +115,12 @@ public sealed class XmpProfile : ImageProfile, IXmpProfile
     /// Converts this instance to an IXPathNavigable.
     /// </summary>
     /// <returns>A <see cref="IXPathNavigable"/>.</returns>
-    public IXPathNavigable ToIXPathNavigable()
+    public IXPathNavigable? ToIXPathNavigable()
     {
         using var reader = CreateReader();
+        if (reader is null)
+            return null;
+
         var result = XmlHelper.CreateDocument();
         result.Load(reader);
         return result.CreateNavigator();
@@ -122,15 +130,28 @@ public sealed class XmpProfile : ImageProfile, IXmpProfile
     /// Converts this instance to a XDocument.
     /// </summary>
     /// <returns>A <see cref="XDocument"/>.</returns>
-    public XDocument ToXDocument()
+    public XDocument? ToXDocument()
     {
         using var reader = CreateReader();
+        if (reader is null)
+            return null;
+
         return XDocument.Load(reader);
+    }
+
+    private static XmlWriter CreateXmlWriter(MemoryStream memStream)
+    {
+        var settings = new XmlWriterSettings
+        {
+            OmitXmlDeclaration = true,
+            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+        };
+        return XmlWriter.Create(memStream, settings);
     }
 
     private static byte[] CheckTrailingNULL(byte[] data)
     {
-        Throw.IfNull(nameof(data), data);
+        Throw.IfNull(data);
 
         var length = data.Length;
 

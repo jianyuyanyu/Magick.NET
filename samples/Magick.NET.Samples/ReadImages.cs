@@ -66,9 +66,12 @@ public static class ReadImageSamples
         Console.WriteLine(info.Height);
         Console.WriteLine(info.ColorSpace);
         Console.WriteLine(info.Format);
-        Console.WriteLine(info.Density.X);
-        Console.WriteLine(info.Density.Y);
-        Console.WriteLine(info.Density.Units);
+        if (info.Density is not null)
+        {
+            Console.WriteLine(info.Density.X);
+            Console.WriteLine(info.Density.Y);
+            Console.WriteLine(info.Density.Units);
+        }
     }
 
     public static void ReadImageWithMultipleFrames()
@@ -78,7 +81,7 @@ public static class ReadImageSamples
 
         // Read from stream
         using var memStream = LoadMemoryStreamImage();
-        using var imagesromStream = new MagickImageCollection(memStream);
+        using var imagesFromStream = new MagickImageCollection(memStream);
 
         // Read from byte array
         var data = LoadImageBytes();

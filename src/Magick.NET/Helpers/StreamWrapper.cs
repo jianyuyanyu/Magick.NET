@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using ImageMagick.Helpers;
 
 namespace ImageMagick;
 
@@ -37,14 +36,14 @@ internal sealed unsafe class StreamWrapper : IDisposable
 
     public static StreamWrapper CreateForReading(Stream stream)
     {
-        Throw.IfFalse(nameof(stream), stream.CanRead, "The stream should be readable.");
+        Throw.IfFalse(stream.CanRead, nameof(stream), "The stream should be readable.");
 
         return new StreamWrapper(stream);
     }
 
     public static StreamWrapper CreateForWriting(Stream stream)
     {
-        Throw.IfFalse(nameof(stream), stream.CanWrite, "The stream should be writable.");
+        Throw.IfFalse(stream.CanWrite, nameof(stream), "The stream should be writable.");
 
         return new StreamWrapper(stream);
     }

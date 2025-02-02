@@ -17,15 +17,15 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
 
     private MagickFormatInfo(NativeMagickFormatInfo instance)
     {
-        Format = GetFormat(instance.Format);
-        Description = instance.Description;
-        CanReadMultithreaded = instance.CanReadMultithreaded;
-        CanWriteMultithreaded = instance.CanWriteMultithreaded;
-        SupportsMultipleFrames = instance.SupportsMultipleFrames;
-        SupportsReading = instance.SupportsReading;
-        SupportsWriting = instance.SupportsWriting;
-        MimeType = instance.MimeType;
-        ModuleFormat = GetFormat(instance.Module);
+        Format = GetFormat(instance.Format_Get());
+        Description = instance.Description_Get();
+        CanReadMultithreaded = instance.CanReadMultithreaded_Get();
+        CanWriteMultithreaded = instance.CanWriteMultithreaded_Get();
+        SupportsMultipleFrames = instance.SupportsMultipleFrames_Get();
+        SupportsReading = instance.SupportsReading_Get();
+        SupportsWriting = instance.SupportsWriting_Get();
+        MimeType = instance.MimeType_Get();
+        ModuleFormat = GetFormat(instance.Module_Get());
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
     /// <returns>The format information.</returns>
     public static IMagickFormatInfo? Create(FileInfo file)
     {
-        Throw.IfNull(nameof(file), file);
+        Throw.IfNull(file);
 
         var format = EnumHelper.ParseMagickFormatFromExtension(file);
 
@@ -109,18 +109,15 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
 
     /// <summary>
     /// Returns the format information. The header of the image in the array of bytes is used to
-    /// determine the format.
+    /// determine the format. Null will be returned when the format could not be determined.
     /// </summary>
     /// <param name="data">The array of bytes to read the image header from.</param>
     /// <returns>The format information.</returns>
     public static IMagickFormatInfo? Create(byte[] data)
     {
-        Throw.IfNullOrEmpty(nameof(data), data);
+        Throw.IfNullOrEmpty(data);
 
-        var instance = new NativeMagickFormatInfo();
-        instance.GetInfoWithBlob(data, data.Length);
-
-        return Create(instance);
+        return NativeMagickFormatInfo.GetInfoWithBlob(data, (uint)data.Length);
     }
 
     /// <summary>
@@ -132,7 +129,7 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
     public static IMagickFormatInfo? Create(string fileName)
     {
         var filePath = FileHelper.CheckForBaseDirectory(fileName);
-        Throw.IfNullOrEmpty(nameof(fileName), filePath);
+        Throw.IfNullOrEmpty(filePath, nameof(fileName));
 
         return Create(new FileInfo(filePath));
     }
@@ -143,7 +140,7 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
     /// <param name="obj">The object to compare this <see cref="MagickFormatInfo"/> with.</param>
     /// <returns>True when the specified object is equal to the current <see cref="MagickFormatInfo"/>.</returns>
     public override bool Equals(object? obj)
-        => Equals(obj as MagickFormatInfo);
+        => Equals(obj as IMagickFormatInfo);
 
     /// <summary>
     /// Determines whether the specified <see cref="IMagickFormatInfo"/> is equal to the current <see cref="MagickFormatInfo"/>.
@@ -180,21 +177,7 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
     /// </summary>
     /// <returns>True when the format was found and unregistered.</returns>
     public bool Unregister()
-        => NativeMagickFormatInfo.Unregister(Enum.GetName(Format.GetType(), Format));
-
-    private static MagickFormatInfo? Create(NativeMagickFormatInfo instance)
-    {
-        if (!instance.HasInstance)
-            return null;
-
-        return new MagickFormatInfo(instance);
-    }
-
-    private static MagickFormatInfo? Create(NativeMagickFormatInfo instance, string name)
-    {
-        instance.GetInfoByName(name);
-        return Create(instance);
-    }
+        => NativeMagickFormatInfo.Unregister(EnumHelper.GetName(Format));
 
     private static MagickFormat GetFormat(string? format)
     {
@@ -217,43 +200,39 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
         var formats = new Dictionary<MagickFormat, IMagickFormatInfo>();
 
         var list = IntPtr.Zero;
-        var length = (UIntPtr)0;
-        var instance = new NativeMagickFormatInfo();
-
+        nuint length = 0;
         try
         {
-            list = instance.CreateList(out length);
+            list = NativeMagickFormatInfo.CreateList(out length);
 
             var ptr = list;
-            for (var i = 0; i < (int)length; i++)
+            for (var i = 0U; i < length; i++)
             {
-                instance.GetInfo(list, i);
-
-                var formatInfo = Create(instance);
+                var formatInfo = NativeMagickFormatInfo.GetInfo(list, i);
                 if (formatInfo is not null)
                     formats[formatInfo.Format] = formatInfo;
 
                 ptr = new IntPtr(ptr.ToInt64() + i);
             }
-
-            AddStealthCoders(instance, formats);
         }
         finally
         {
             if (list != IntPtr.Zero)
-                NativeMagickFormatInfo.DisposeList(list, (int)length);
+                NativeMagickFormatInfo.DisposeList(list, length);
         }
+
+        AddStealthCoders(formats);
 
         return formats;
     }
 
-    private static void AddStealthCoders(NativeMagickFormatInfo instance, Dictionary<MagickFormat, IMagickFormatInfo> formats)
+    private static void AddStealthCoders(Dictionary<MagickFormat, IMagickFormatInfo> formats)
     {
-        var formatInfo = Create(instance, "DIB");
+        var formatInfo = NativeMagickFormatInfo.GetInfoByName("DIB");
         if (formatInfo is not null)
             formats[formatInfo.Format] = formatInfo;
 
-        formatInfo = Create(instance, "TIF");
+        formatInfo = NativeMagickFormatInfo.GetInfoByName("TIF");
         if (formatInfo is not null)
             formats[formatInfo.Format] = formatInfo;
     }

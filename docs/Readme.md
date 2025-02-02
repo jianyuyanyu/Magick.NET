@@ -5,9 +5,9 @@
 You have two options to get the Magick.NET binaries in your project:
 - Use NuGet:
   - Right click on the references of your project and choose 'Manage NuGet packages'.
-  - Search for Magick.NET and choose the package that uses the platform of your choice: x86/x64 or AnyCPU.
+  - Search for Magick.NET and choose the package that uses the platform of your choice: x64/arm64/x86 or AnyCPU.
 - Build Magick.NET yourself:
-  - Instructions on how to build Magick.NET can be found [here](../Building.md).
+  - Instructions on how to build Magick.NET can be found [here](../BUILDING.md).
 
 For some formats additional software needs to be installed:
 - AI/EPS/PDF/PS requires [Ghostscript](https://www.ghostscript.com/download/gsdnld.html).
@@ -100,9 +100,6 @@ provide you with some help on how to use Magick.NET.
   - Create a PDF file from two images
   - Create a PDF file from a single image
   - Read a single page from a PDF file
-- [Read raw image from camera](ReadRawImageFromCamera.md)
-  - Installation
-  - Convert to CR2 to JPG
 - [Command line option -define](Defines.md)
   - Command line option -define
   - Defines that need to be set before reading an image
@@ -111,6 +108,8 @@ provide you with some help on how to use Magick.NET.
 - [Exif data](ExifData.md)
   - Read exif data
   - Create thumbnail from exif data
+- [Read raw thumbnail](ReadRawThumbnail.md)
+  - Read thumbnail from raw image
 - [Lossless compression](LosslessCompression.md)
   - Lossless compress JPEG logo
 - [Detailed debug information](DetailedDebugInformation.md)

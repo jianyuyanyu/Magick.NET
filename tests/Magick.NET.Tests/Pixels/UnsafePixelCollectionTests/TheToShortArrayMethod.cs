@@ -1,7 +1,6 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using System;
 using ImageMagick;
 using Xunit;
 
@@ -12,19 +11,13 @@ public partial class UnsafePixelCollectionTests
     public class TheToShortArrayMethod
     {
         [Fact]
-        public void ShouldThrowExceptionWhenXTooLow()
+        public void ShouldReturnPixelsWhenXTooLow()
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
 
-            if (Runtime.Is64Bit)
-            {
-                pixels.ToShortArray(-1, 0, 1, 1, "RGB");
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.ToShortArray(-1, 0, 1, 1, "RGB"));
-            }
+            var result = pixels.ToShortArray(-1, 0, 1, 1, "RGB");
+            Assert.Equal(new ushort[] { 65535, 65535, 65535 }, result);
         }
 
         [Fact]
@@ -35,6 +28,7 @@ public partial class UnsafePixelCollectionTests
             var values = pixels.ToShortArray(60, 60, 63, 58, "RGBA");
             var length = 63 * 58 * 4;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
 
@@ -46,6 +40,7 @@ public partial class UnsafePixelCollectionTests
             var values = pixels.ToShortArray(60, 60, 63, 58, PixelMapping.RGBA);
             var length = 63 * 58 * 4;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
 
@@ -54,7 +49,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
-            var values = pixels.ToShortArray(null, "RGB");
+            var values = pixels.ToShortArray(null!, "RGB");
 
             Assert.Null(values);
         }
@@ -64,7 +59,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
-            var values = pixels.ToShortArray(new MagickGeometry(1, 2, 3, 4), null);
+            var values = pixels.ToShortArray(new MagickGeometry(1, 2, 3, 4), null!);
 
             Assert.Null(values);
         }
@@ -86,6 +81,7 @@ public partial class UnsafePixelCollectionTests
             var values = pixels.ToShortArray(new MagickGeometry(10, 10, 113, 108), "RG");
             var length = 113 * 108 * 2;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
 
@@ -97,6 +93,7 @@ public partial class UnsafePixelCollectionTests
             var values = pixels.ToShortArray(new MagickGeometry(10, 10, 113, 108), PixelMapping.RGB);
             var length = 113 * 108 * 3;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
 
@@ -105,7 +102,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
-            var values = pixels.ToShortArray(null);
+            var values = pixels.ToShortArray(null!);
 
             Assert.Null(values);
         }
@@ -134,8 +131,9 @@ public partial class UnsafePixelCollectionTests
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
             var values = pixels.ToShortArray("RG");
-            var length = image.Width * image.Height * 2;
+            var length = (int)image.Width * image.Height * 2;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
 
@@ -145,8 +143,9 @@ public partial class UnsafePixelCollectionTests
             using var image = new MagickImage(Files.ImageMagickJPG);
             using var pixels = image.GetPixelsUnsafe();
             var values = pixels.ToShortArray(PixelMapping.RGB);
-            var length = image.Width * image.Height * 3;
+            var length = (int)image.Width * image.Height * 3;
 
+            Assert.NotNull(values);
             Assert.Equal(length, values.Length);
         }
     }

@@ -23,8 +23,8 @@ public class ThePngCoder
             image.Read(Files.CorruptPNG);
         });
 
-        Assert.Equal(4, image.Width);
-        Assert.Equal(2, image.Height);
+        Assert.Equal(4U, image.Width);
+        Assert.Equal(2U, image.Height);
     }
 
     [Fact]
@@ -32,8 +32,8 @@ public class ThePngCoder
     {
         using var image = new MagickImage(Files.VicelandPNG);
 
-        Assert.Equal(200, image.Width);
-        Assert.Equal(28, image.Height);
+        Assert.Equal(200U, image.Width);
+        Assert.Equal(28U, image.Height);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ThePngCoder
     {
         using var input = new MagickImage(MagickColors.YellowGreen, 1, 1);
 
-        IExifProfile exifProfile = new ExifProfile();
+        IExifProfile? exifProfile = new ExifProfile();
         exifProfile.SetValue(ExifTag.ImageUniqueID, "Have a nice day");
 
         input.SetProfile(exifProfile);
@@ -77,6 +77,8 @@ public class ThePngCoder
         Assert.NotNull(exifProfile);
 
         var value = exifProfile.GetValue(ExifTag.ImageUniqueID);
+
+        Assert.NotNull(value);
         Assert.Equal("Have a nice day", value.ToString());
     }
 
@@ -88,7 +90,7 @@ public class ThePngCoder
 
         foreach (var image in images)
         {
-            Assert.Equal(20, image.AnimationDelay);
+            Assert.Equal(20U, image.AnimationDelay);
             Assert.Equal(100, image.AnimationTicksPerSecond);
         }
     }
@@ -256,6 +258,6 @@ public class ThePngCoder
         return DateTime.Parse(content.Substring(offset + name.Length, 25));
     }
 
-    private void HandleWarning(object sender, WarningEventArgs e)
+    private void HandleWarning(object? sender, WarningEventArgs e)
         => throw new XunitException("Warning was raised: " + e.Message);
 }

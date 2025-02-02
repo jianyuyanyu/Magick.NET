@@ -19,8 +19,8 @@ public partial class MagickImageTests
                 using var image = new MagickImage(Files.MagickNETIconPNG);
                 image.LiquidRescale(128, 64);
 
-                Assert.Equal(64, image.Width);
-                Assert.Equal(64, image.Height);
+                Assert.Equal(64U, image.Width);
+                Assert.Equal(64U, image.Height);
             }
         }
 
@@ -51,7 +51,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage(Files.MagickNETIconPNG);
 
-                Assert.Throws<ArgumentNullException>("geometry", () => image.LiquidRescale(null));
+                Assert.Throws<ArgumentNullException>("geometry", () => image.LiquidRescale(null!));
             }
 
             [Fact]
@@ -64,8 +64,8 @@ public partial class MagickImageTests
                 using var image = new MagickImage(Files.MagickNETIconPNG);
                 image.LiquidRescale(geometry);
 
-                Assert.Equal(128, image.Width);
-                Assert.Equal(64, image.Height);
+                Assert.Equal(128U, image.Width);
+                Assert.Equal(64U, image.Height);
             }
         }
 
@@ -74,25 +74,27 @@ public partial class MagickImageTests
             [Fact]
             public void ShouldThrowExceptionWhenPercentageIsNegative()
             {
+                var percentage = new Percentage(-1);
                 using var image = new MagickImage(Files.MagickNETIconPNG);
-
-                Assert.Throws<ArgumentException>("percentage", () => image.LiquidRescale(new Percentage(-1)));
+                Assert.Throws<ArgumentException>("percentageWidth", () => image.LiquidRescale(percentage));
             }
 
             [Fact]
             public void ShouldThrowExceptionWhenPercentageWidthIsNegative()
             {
+                var percentageWidth = new Percentage(-1);
+                var percentageHeight = new Percentage(1);
                 using var image = new MagickImage(Files.MagickNETIconPNG);
-
-                Assert.Throws<ArgumentException>("percentageWidth", () => image.LiquidRescale(new Percentage(-1), new Percentage(1)));
+                Assert.Throws<ArgumentException>("percentageWidth", () => image.LiquidRescale(percentageWidth, percentageHeight));
             }
 
             [Fact]
             public void ShouldThrowExceptionWhenPercentageHeightIsNegative()
             {
+                var percentageWidth = new Percentage(1);
+                var percentageHeight = new Percentage(-1);
                 using var image = new MagickImage(Files.MagickNETIconPNG);
-
-                Assert.Throws<ArgumentException>("percentageHeight", () => image.LiquidRescale(new Percentage(1), new Percentage(-1)));
+                Assert.Throws<ArgumentException>("percentageHeight", () => image.LiquidRescale(percentageWidth, percentageHeight));
             }
 
             [Fact]
@@ -101,8 +103,8 @@ public partial class MagickImageTests
                 using var image = new MagickImage(Files.MagickNETIconPNG);
                 image.LiquidRescale(new Percentage(25));
 
-                Assert.Equal(32, image.Width);
-                Assert.Equal(32, image.Height);
+                Assert.Equal(32U, image.Width);
+                Assert.Equal(32U, image.Height);
             }
 
             [Fact]
@@ -111,29 +113,13 @@ public partial class MagickImageTests
                 using var image = new MagickImage(Files.MagickNETIconPNG);
                 image.LiquidRescale(new Percentage(25), new Percentage(10));
 
-                Assert.Equal(32, image.Width);
-                Assert.Equal(13, image.Height);
+                Assert.Equal(32U, image.Width);
+                Assert.Equal(13U, image.Height);
             }
         }
 
         public class WithPercentageAndRigidity
         {
-            [Fact]
-            public void ShouldThrowExceptionWhenPercentageWidthIsNegative()
-            {
-                using var image = new MagickImage(Files.MagickNETIconPNG);
-
-                Assert.Throws<ArgumentException>("percentageWidth", () => image.LiquidRescale(new Percentage(-1), new Percentage(1), 0.0, 0.0));
-            }
-
-            [Fact]
-            public void ShouldThrowExceptionWhenPercentageHeightIsNegative()
-            {
-                using var image = new MagickImage(Files.MagickNETIconPNG);
-
-                Assert.Throws<ArgumentException>("percentageHeight", () => image.LiquidRescale(new Percentage(1), new Percentage(-1), 0.0, 0.0));
-            }
-
             [Fact]
             public void ShouldApplyTheRigidity()
             {

@@ -12,9 +12,14 @@ namespace ImageMagick;
 public interface IEightBimValue : IEquatable<IEightBimValue?>
 {
     /// <summary>
-    /// Gets the ID of the 8bim value.
+    /// Gets the id of the 8bim value.
     /// </summary>
-    short ID { get; }
+    short Id { get; }
+
+    /// <summary>
+    /// Gets the name of the 8bim value.
+    /// </summary>
+    string? Name { get; }
 
     /// <summary>
     /// Converts this instance to a byte array.

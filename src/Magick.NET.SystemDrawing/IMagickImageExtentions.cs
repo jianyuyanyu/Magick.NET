@@ -24,8 +24,8 @@ public static partial class IMagickImageExtentions
     public static void Read<TQuantumType>(this IMagickImage<TQuantumType> self, Bitmap bitmap)
         where TQuantumType : struct, IConvertible
     {
-        Throw.IfNull(nameof(self), self);
-        Throw.IfNull(nameof(bitmap), bitmap);
+        Throw.IfNull(self);
+        Throw.IfNull(bitmap);
 
         using var memStream = new MemoryStream();
         if (IsSupportedImageFormat(bitmap.RawFormat))
@@ -84,7 +84,7 @@ public static partial class IMagickImageExtentions
     private static Bitmap ToBitmap<TQuantumType>(this IMagickImage<TQuantumType> self, bool withDensity)
         where TQuantumType : struct, IConvertible
     {
-        Throw.IfNull(nameof(self), self);
+        Throw.IfNull(self);
 
         var image = self;
 
@@ -104,10 +104,10 @@ public static partial class IMagickImageExtentions
             using var pixels = image.GetPixelsUnsafe();
             var mapping = GetMapping(format);
 
-            var bitmap = new Bitmap(image.Width, image.Height, format);
+            var bitmap = new Bitmap((int)image.Width, (int)image.Height, format);
             for (var y = 0; y < image.Height; y++)
             {
-                var row = new Rectangle(0, y, image.Width, 1);
+                var row = new Rectangle(0, y, (int)image.Width, 1);
                 var data = bitmap.LockBits(row, ImageLockMode.WriteOnly, format);
                 var destination = data.Scan0;
 
@@ -133,10 +133,10 @@ public static partial class IMagickImageExtentions
     private static Bitmap ToBitmap<TQuantumType>(IMagickImage<TQuantumType> self, ImageFormat imageFormat, bool withDensity)
         where TQuantumType : struct, IConvertible
     {
-        Throw.IfNull(nameof(self), self);
-        Throw.IfNull(nameof(imageFormat), imageFormat);
+        Throw.IfNull(self);
+        Throw.IfNull(imageFormat);
 
-        var format = imageFormat.ToFormat();
+        var format = imageFormat.ToMagickFormat();
 
         var memStream = new MemoryStream();
         self.Write(memStream, format);
@@ -159,7 +159,7 @@ public static partial class IMagickImageExtentions
 
     private static Density GetDefaultDensity(IMagickImage image)
     {
-        if (image.Density.Units == DensityUnit.Undefined && image.Density.X == 0 && image.Density.Y == 0)
+        if (image.Density.X <= 0 || image.Density.Y <= 0)
             return new Density(96);
 
         return image.Density.ChangeUnits(DensityUnit.PixelsPerInch);

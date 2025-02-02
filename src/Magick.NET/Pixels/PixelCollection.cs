@@ -19,43 +19,52 @@ namespace ImageMagick;
 
 internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
 {
-    protected PixelCollection(MagickImage image)
-    {
-        Image = image;
-        _nativeInstance = new NativePixelCollection(image);
-    }
+    private NativePixelCollection? _nativeInstance;
 
-    public int Channels
+    protected PixelCollection(MagickImage image)
+        => Image = image;
+
+    public uint Channels
         => Image.ChannelCount;
 
     protected MagickImage Image { get; }
+
+    private NativePixelCollection NativeInstance
+    {
+        get
+        {
+            _nativeInstance ??= NativePixelCollection.Create(Image);
+
+            return _nativeInstance;
+        }
+    }
 
     public IPixel<QuantumType>? this[int x, int y]
         => GetPixel(x, y);
 
     public void Dispose()
-        => _nativeInstance.Dispose();
+        => _nativeInstance?.Dispose();
 
-    public virtual QuantumType[]? GetArea(int x, int y, int width, int height)
+    public virtual QuantumType[]? GetArea(int x, int y, uint width, uint height)
         => GetAreaUnchecked(x, y, width, height);
 
     public virtual QuantumType[]? GetArea(IMagickGeometry geometry)
         => GetArea(geometry.X, geometry.Y, geometry.Width, geometry.Height);
 
-    public virtual IntPtr GetAreaPointer(int x, int y, int width, int height)
-        => _nativeInstance.GetArea(x, y, width, height);
+    public virtual IntPtr GetAreaPointer(int x, int y, uint width, uint height)
+        => NativeInstance.GetArea(x, y, width, height);
 
     public virtual IntPtr GetAreaPointer(IMagickGeometry geometry)
         => GetAreaPointer(geometry.X, geometry.Y, geometry.Width, geometry.Height);
+
+    public uint? GetChannelIndex(PixelChannel channel)
+        => Image.ChannelOffset(channel);
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
 
     public IEnumerator<IPixel<QuantumType>> GetEnumerator()
         => new PixelCollectionEnumerator(this, Image.Width, Image.Height);
-
-    public int GetIndex(PixelChannel channel)
-        => Image.ChannelOffset(channel);
 
     public virtual IPixel<QuantumType> GetPixel(int x, int y)
         => Pixel.Create(this, x, y, GetAreaUnchecked(x, y, 1, 1)!);
@@ -66,13 +75,13 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
     public QuantumType[]? GetValues()
         => GetAreaUnchecked(0, 0, Image.Width, Image.Height);
 
-    public virtual void SetArea(int x, int y, int width, int height, QuantumType[] values)
+    public virtual void SetArea(int x, int y, uint width, uint height, QuantumType[] values)
         => SetAreaUnchecked(x, y, width, height, values);
 
     public virtual void SetArea(IMagickGeometry geometry, QuantumType[] values)
         => SetArea(geometry.X, geometry.Y, geometry.Width, geometry.Height, values);
 
-    public virtual void SetByteArea(int x, int y, int width, int height, byte[] values)
+    public virtual void SetByteArea(int x, int y, uint width, uint height, byte[] values)
     {
         var castedValues = CastArray(values, Quantum.Convert);
         SetAreaUnchecked(x, y, width, height, castedValues);
@@ -87,7 +96,7 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
         SetAreaUnchecked(0, 0, Image.Width, Image.Height, castedValues);
     }
 
-    public virtual void SetDoubleArea(int x, int y, int width, int height, double[] values)
+    public virtual void SetDoubleArea(int x, int y, uint width, uint height, double[] values)
     {
         var castedValues = CastArray(values, Quantum.Convert);
         SetAreaUnchecked(x, y, width, height, castedValues);
@@ -102,7 +111,7 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
         SetAreaUnchecked(0, 0, Image.Width, Image.Height, castedValues);
     }
 
-    public virtual void SetIntArea(int x, int y, int width, int height, int[] values)
+    public virtual void SetIntArea(int x, int y, uint width, uint height, int[] values)
     {
         var castedValues = CastArray(values, Quantum.Convert);
         SetAreaUnchecked(x, y, width, height, castedValues);
@@ -142,15 +151,15 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
     public QuantumType[]? ToArray()
         => GetValues();
 
-    public virtual byte[]? ToByteArray(int x, int y, int width, int height, string mapping)
+    public virtual byte[]? ToByteArray(int x, int y, uint width, uint height, string mapping)
     {
         var nativeResult = IntPtr.Zero;
         byte[]? result = null;
 
         try
         {
-            nativeResult = _nativeInstance.ToByteArray(x, y, width, height, mapping);
-            result = ByteConverter.ToArray(nativeResult, width * height * mapping.Length);
+            nativeResult = NativeInstance.ToByteArray(x, y, width, height, mapping);
+            result = ByteConverter.ToArray(nativeResult, (int)(width * height * mapping.Length));
         }
         finally
         {
@@ -160,7 +169,7 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
         return result;
     }
 
-    public virtual byte[]? ToByteArray(int x, int y, int width, int height, PixelMapping mapping)
+    public virtual byte[]? ToByteArray(int x, int y, uint width, uint height, PixelMapping mapping)
         => ToByteArray(x, y, width, height, mapping.ToString());
 
     public virtual byte[]? ToByteArray(IMagickGeometry geometry, string mapping)
@@ -175,14 +184,14 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
     public byte[]? ToByteArray(PixelMapping mapping)
         => ToByteArray(0, 0, Image.Width, Image.Height, mapping.ToString());
 
-    public virtual ushort[]? ToShortArray(int x, int y, int width, int height, string mapping)
+    public virtual ushort[]? ToShortArray(int x, int y, uint width, uint height, string mapping)
     {
         var nativeResult = IntPtr.Zero;
 
         try
         {
-            nativeResult = _nativeInstance.ToShortArray(x, y, width, height, mapping);
-            return ShortConverter.ToArray(nativeResult, width * height * mapping.Length);
+            nativeResult = NativeInstance.ToShortArray(x, y, width, height, mapping);
+            return ShortConverter.ToArray(nativeResult, (int)(width * height * mapping.Length));
         }
         finally
         {
@@ -190,7 +199,7 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
         }
     }
 
-    public virtual ushort[]? ToShortArray(int x, int y, int width, int height, PixelMapping mapping)
+    public virtual ushort[]? ToShortArray(int x, int y, uint width, uint height, PixelMapping mapping)
         => ToShortArray(x, y, width, height, mapping.ToString());
 
     public virtual ushort[]? ToShortArray(IMagickGeometry geometry, string mapping)
@@ -205,9 +214,9 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
     public ushort[]? ToShortArray(PixelMapping mapping)
         => ToShortArray(0, 0, Image.Width, Image.Height, mapping.ToString());
 
-    internal QuantumType[]? GetAreaUnchecked(int x, int y, int width, int height)
+    internal QuantumType[]? GetAreaUnchecked(int x, int y, uint width, uint height)
     {
-        var pixels = _nativeInstance.GetArea(x, y, width, height);
+        var pixels = NativeInstance.GetArea(x, y, width, height);
         if (pixels == IntPtr.Zero)
             throw new InvalidOperationException("Image contains no pixel data.");
 
@@ -227,6 +236,6 @@ internal abstract partial class PixelCollection : IPixelCollection<QuantumType>
         return result;
     }
 
-    private void SetAreaUnchecked(int x, int y, int width, int height, QuantumType[] values)
-        => _nativeInstance.SetArea(x, y, width, height, values, values.Length);
+    private void SetAreaUnchecked(int x, int y, uint width, uint height, QuantumType[] values)
+        => NativeInstance.SetArea(x, y, width, height, values, (uint)values.Length);
 }

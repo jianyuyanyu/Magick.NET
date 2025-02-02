@@ -1,7 +1,6 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using System;
 using ImageMagick;
 using Xunit;
 
@@ -21,6 +20,8 @@ public partial class ChannelMomentsTests
             var second = moments.GetChannel(PixelChannel.Red);
 
             Assert.False(ReferenceEquals(first, second));
+            Assert.NotNull(first);
+            Assert.NotNull(second);
             Assert.True(first.Centroid == second.Centroid);
             Assert.True(first.Centroid.Equals(second.Centroid));
             Assert.True(first.Centroid.Equals((object)second.Centroid));

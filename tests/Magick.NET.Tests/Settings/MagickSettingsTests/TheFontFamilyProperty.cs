@@ -11,13 +11,17 @@ public partial class MagickSettingsTests
     public class TheFontFamilyProperty
     {
         [Fact]
+        public void ShouldDefaultToNull()
+        {
+            using var image = new MagickImage();
+
+            Assert.Null(image.Settings.FontFamily);
+        }
+
+        [Fact]
         public void ShouldChangeTheFont()
         {
             using var image = new MagickImage();
-            Assert.Null(image.Settings.FontFamily);
-            Assert.Equal(0, image.Settings.FontPointsize);
-            Assert.Equal(FontStyleType.Undefined, image.Settings.FontStyle);
-            Assert.Equal(FontWeight.Undefined, image.Settings.FontWeight);
 
             image.Settings.FontFamily = "Courier New";
             image.Settings.FontPointsize = 40;
@@ -25,8 +29,8 @@ public partial class MagickSettingsTests
             image.Settings.FontWeight = FontWeight.ExtraBold;
             image.Read("label:Test");
 
-            Assert.Contains(image.Width, new[] { 97, 98 });
-            Assert.Equal(48, image.Height);
+            Assert.Contains(image.Width, new[] { 97U, 98U });
+            Assert.Equal(48U, image.Height);
 
             // Different result on MacOS
             if (image.Width != 97)

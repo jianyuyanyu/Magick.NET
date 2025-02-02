@@ -34,7 +34,7 @@ public partial class OpenCL : IOpenCL
     /// Gets all the OpenCL devices.
     /// </summary>
     /// <returns>A <see cref="IOpenCLDevice"/> iteration.</returns>
-    public static IReadOnlyCollection<IOpenCLDevice> Devices
+    public static IReadOnlyList<IOpenCLDevice> Devices
     {
         get
         {
@@ -44,12 +44,10 @@ public partial class OpenCL : IOpenCL
             if (devices == IntPtr.Zero)
                 return result;
 
-            for (var i = 0; i < (int)length; i++)
+            for (var i = 0U; i < length; i++)
             {
-                var instance = NativeOpenCL.GetDevice(devices, i);
-                var device = OpenCLDevice.CreateInstance(instance);
-                if (device is not null)
-                    result.Add(device);
+                var device = NativeOpenCL.GetDevice(devices, i);
+                result.Add(device);
             }
 
             return result;
@@ -69,7 +67,7 @@ public partial class OpenCL : IOpenCL
     /// Gets all the OpenCL devices.
     /// </summary>
     /// <returns>A <see cref="IOpenCLDevice"/> iteration.</returns>
-    IReadOnlyCollection<IOpenCLDevice> IOpenCL.Devices
+    IReadOnlyList<IOpenCLDevice> IOpenCL.Devices
         => Devices;
 
     /// <summary>

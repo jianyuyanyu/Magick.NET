@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 #if Q8
@@ -40,7 +41,7 @@ public partial class ColorRGBTests
         public void ShouldReturnTrueWhenOtherIsEqual()
         {
             var first = new ColorRGB(Quantum.Max, Quantum.Max, Quantum.Max);
-            var second = (ColorRGB)new MagickColor(Quantum.Max, Quantum.Max, Quantum.Max);
+            var second = (ColorRGB?)new MagickColor(Quantum.Max, Quantum.Max, Quantum.Max);
 
             Assert.True(first.FuzzyEquals(second, (Percentage)0));
         }

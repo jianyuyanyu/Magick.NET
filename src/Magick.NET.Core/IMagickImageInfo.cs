@@ -38,7 +38,7 @@ public partial interface IMagickImageInfo
     /// <summary>
     /// Gets the height of the image.
     /// </summary>
-    int Height { get; }
+    uint Height { get; }
 
     /// <summary>
     /// Gets the type of interlacing.
@@ -46,14 +46,19 @@ public partial interface IMagickImageInfo
     Interlace Interlace { get; }
 
     /// <summary>
+    /// Gets the orientation of the image.
+    /// </summary>
+    OrientationType Orientation { get; }
+
+    /// <summary>
     /// Gets the JPEG/MIFF/PNG compression level.
     /// </summary>
-    int Quality { get; }
+    uint Quality { get; }
 
     /// <summary>
     /// Gets the width of the image.
     /// </summary>
-    int Width { get; }
+    uint Width { get; }
 
     /// <summary>
     /// Read basic information about an image.
@@ -69,7 +74,7 @@ public partial interface IMagickImageInfo
     /// <param name="offset">The offset at which to begin reading data.</param>
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
-    void Read(byte[] data, int offset, int count);
+    void Read(byte[] data, uint offset, uint count);
 
     /// <summary>
     /// Read basic information about an image.

@@ -13,7 +13,7 @@ using QuantumType = System.Single;
 #error Not implemented!
 #endif
 
-namespace ImageMagick;
+namespace ImageMagick.Colors;
 
 /// <summary>
 /// Class that represents a monochrome color.
@@ -44,7 +44,7 @@ public sealed class ColorMono : ColorBase
         => new ColorMono(true);
 
     /// <summary>
-    /// Gets a new instance of the <see cref="ColorMono"/> class that is black.
+    /// Gets a new instance of the <see cref="ColorMono"/> class that is white.
     /// </summary>
     public static ColorMono White
         => new ColorMono(false);

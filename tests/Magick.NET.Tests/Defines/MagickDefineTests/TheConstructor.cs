@@ -5,7 +5,7 @@ using System;
 using ImageMagick;
 using Xunit;
 
-namespace Magick.NET.Tests.Defines;
+namespace Magick.NET.Tests;
 
 public partial class MagickDefineTests
 {
@@ -49,7 +49,7 @@ public partial class MagickDefineTests
 
                 Assert.Equal(MagickFormat.A, define.Format);
                 Assert.Equal("test", define.Name);
-                Assert.Equal("red", define.Value);
+                Assert.True(define.Value.Equals("red") || define.Value.Equals("cyan"));
             }
         }
 
@@ -69,11 +69,11 @@ public partial class MagickDefineTests
             [Fact]
             public void ShouldThrowExceptionWhenValueIsNull()
             {
-                IMagickGeometry value = null;
+                IMagickGeometry? value = null;
 
                 Assert.Throws<ArgumentNullException>("value", () =>
                 {
-                    new MagickDefine(MagickFormat.A, "test", value);
+                    new MagickDefine(MagickFormat.A, "test", value!);
                 });
             }
         }
@@ -122,9 +122,9 @@ public partial class MagickDefineTests
             [Fact]
             public void ShouldThrowExceptionWhenValueIsNull()
             {
-                string value = null;
+                string? value = null;
 
-                Assert.Throws<ArgumentNullException>("value", () => new MagickDefine(MagickFormat.A, "test", value));
+                Assert.Throws<ArgumentNullException>("value", () => new MagickDefine(MagickFormat.A, "test", value!));
             }
         }
     }

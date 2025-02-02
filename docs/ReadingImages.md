@@ -53,9 +53,12 @@ Console.WriteLine(info.Width);
 Console.WriteLine(info.Height);
 Console.WriteLine(info.ColorSpace);
 Console.WriteLine(info.Format);
-Console.WriteLine(info.Density.X);
-Console.WriteLine(info.Density.Y);
-Console.WriteLine(info.Density.Units);
+if (info.Density is not null)
+{
+    Console.WriteLine(info.Density.X);
+    Console.WriteLine(info.Density.Y);
+    Console.WriteLine(info.Density.Units);
+}
 ```
 
 ## Read image with multiple layers/frames:
@@ -66,7 +69,7 @@ using var imagesFromFile = new MagickImageCollection(SampleFiles.SnakewareJpg);
 
 // Read from stream
 using var memStream = LoadMemoryStreamImage();
-using var imagesromStream = new MagickImageCollection(memStream);
+using var imagesFromStream = new MagickImageCollection(memStream);
 
 // Read from byte array
 var data = LoadImageBytes();

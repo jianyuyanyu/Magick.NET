@@ -20,7 +20,7 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null));
+                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null!));
             }
 
             [Fact]
@@ -47,7 +47,7 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null, MagickFormat.Bmp));
+                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null!, MagickFormat.Bmp));
             }
 
             [Fact]
@@ -74,7 +74,7 @@ public partial class MagickImageCollectionTests
                 var defines = new TiffWriteDefines();
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null, defines));
+                Assert.Throws<ArgumentNullException>("file", () => images.Write((FileInfo)null!, defines));
             }
 
             [Fact]
@@ -83,7 +83,7 @@ public partial class MagickImageCollectionTests
                 var file = new FileInfo(Files.CirclePNG);
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("defines", () => images.Write(file, null));
+                Assert.Throws<ArgumentNullException>("defines", () => images.Write(file, null!));
             }
 
             [Fact]
@@ -94,13 +94,13 @@ public partial class MagickImageCollectionTests
                     Endian = Endian.MSB,
                 };
                 using var input = new MagickImageCollection(Files.CirclePNG);
-                using var tempfile = new TemporaryFile("foobar");
-                input.Write(tempfile.File, defines);
+                using var tempFile = new TemporaryFile("foobar");
+                input.Write(tempFile.File, defines);
 
                 Assert.Equal(MagickFormat.Png, input[0].Format);
 
                 using var output = new MagickImageCollection();
-                output.Read(tempfile.File);
+                output.Read(tempFile.File);
 
                 Assert.Single(output);
                 Assert.Equal(MagickFormat.Tiff, output[0].Format);
@@ -114,7 +114,7 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null));
+                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null!));
             }
         }
 
@@ -125,19 +125,19 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null, MagickFormat.Bmp));
+                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null!, MagickFormat.Bmp));
             }
 
             [Fact]
             public void ShouldUseTheSpecifiedFormat()
             {
                 using var input = new MagickImageCollection(Files.CirclePNG);
-                using var tempfile = new TemporaryFile("foobar");
-                input.Write(tempfile.File.FullName, MagickFormat.Tiff);
+                using var tempFile = new TemporaryFile("foobar");
+                input.Write(tempFile.File.FullName, MagickFormat.Tiff);
 
                 Assert.Equal(MagickFormat.Png, input[0].Format);
 
-                using var output = new MagickImageCollection(tempfile.File.FullName);
+                using var output = new MagickImageCollection(tempFile.File.FullName);
 
                 Assert.Single(output);
                 Assert.Equal(MagickFormat.Tiff, output[0].Format);
@@ -152,7 +152,7 @@ public partial class MagickImageCollectionTests
                 var defines = new TiffWriteDefines();
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null, defines));
+                Assert.Throws<ArgumentNullException>("fileName", () => images.Write((string)null!, defines));
             }
 
             [Fact]
@@ -160,24 +160,24 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("defines", () => images.Write(Files.CirclePNG, null));
+                Assert.Throws<ArgumentNullException>("defines", () => images.Write(Files.CirclePNG, null!));
             }
 
             [Fact]
             public void ShouldUseTheSpecifiedFormat()
             {
                 using var input = new MagickImageCollection(Files.CirclePNG);
-                using var tempfile = new TemporaryFile("foobar");
+                using var tempFile = new TemporaryFile("foobar");
                 var defines = new TiffWriteDefines()
                 {
                     Endian = Endian.MSB,
                 };
-                input.Write(tempfile.File.FullName, defines);
+                input.Write(tempFile.File.FullName, defines);
 
                 Assert.Equal(MagickFormat.Png, input[0].Format);
 
                 using var output = new MagickImageCollection();
-                output.Read(tempfile.File.FullName);
+                output.Read(tempFile.File.FullName);
 
                 Assert.Single(output);
                 Assert.Equal(MagickFormat.Tiff, output[0].Format);
@@ -191,7 +191,7 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null));
+                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null!));
             }
         }
 
@@ -202,7 +202,7 @@ public partial class MagickImageCollectionTests
             {
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null, MagickFormat.Bmp));
+                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null!, MagickFormat.Bmp));
             }
 
             [Fact]
@@ -240,7 +240,7 @@ public partial class MagickImageCollectionTests
                 var defines = new TiffWriteDefines();
                 using var images = new MagickImageCollection();
 
-                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null, defines));
+                Assert.Throws<ArgumentNullException>("stream", () => images.Write((Stream)null!, defines));
             }
 
             [Fact]
@@ -249,7 +249,7 @@ public partial class MagickImageCollectionTests
                 using var images = new MagickImageCollection();
                 using var stream = new MemoryStream();
 
-                Assert.Throws<ArgumentNullException>("defines", () => images.Write(stream, null));
+                Assert.Throws<ArgumentNullException>("defines", () => images.Write(stream, null!));
             }
 
             [Fact]

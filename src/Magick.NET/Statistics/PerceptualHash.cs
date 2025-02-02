@@ -2,68 +2,68 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace ImageMagick;
 
 /// <summary>
-/// Contains the he perceptual hash of one or more image channels.
+/// Contains the perceptual hash of one or more image channels.
 /// </summary>
 public sealed partial class PerceptualHash : IPerceptualHash
 {
-    private readonly Dictionary<PixelChannel, ChannelPerceptualHash> _channels;
+    private readonly ChannelPerceptualHash _red;
+    private readonly ChannelPerceptualHash _green;
+    private readonly ChannelPerceptualHash _blue;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PerceptualHash"/> class.
     /// </summary>
     /// <param name="hash">The hash.</param>
     public PerceptualHash(string hash)
-      : this()
+        : this(hash, DefaultColorSpaces)
     {
-        Throw.IfNullOrEmpty(nameof(hash), hash);
-        Throw.IfFalse(nameof(hash), hash.Length == 210, "Invalid hash size.");
-
-        _channels[PixelChannel.Red] = new ChannelPerceptualHash(PixelChannel.Red, hash.Substring(0, 70));
-        _channels[PixelChannel.Green] = new ChannelPerceptualHash(PixelChannel.Green, hash.Substring(70, 70));
-        _channels[PixelChannel.Blue] = new ChannelPerceptualHash(PixelChannel.Blue, hash.Substring(140, 70));
     }
 
-    internal PerceptualHash(MagickImage image, IntPtr list)
-      : this()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PerceptualHash"/> class.
+    /// </summary>
+    /// <param name="hash">The hash.</param>
+    /// <param name="colorSpaces">The colorspaces that were used to create this hash.</param>
+    public PerceptualHash(string hash, params ColorSpace[] colorSpaces)
     {
-        if (list == IntPtr.Zero)
-            return;
+        Throw.IfNullOrEmpty(hash);
+        ValidateColorSpaces(colorSpaces);
 
-        AddChannel(image, list, PixelChannel.Red);
-        AddChannel(image, list, PixelChannel.Green);
-        AddChannel(image, list, PixelChannel.Blue);
+        var length = 35 * colorSpaces.Length;
+        Throw.IfFalse(hash.Length == 3 * length, nameof(hash), "Invalid hash size.");
+
+        _red = new ChannelPerceptualHash(PixelChannel.Red, colorSpaces, hash.Substring(0, length));
+        _green = new ChannelPerceptualHash(PixelChannel.Green, colorSpaces, hash.Substring(length, length));
+        _blue = new ChannelPerceptualHash(PixelChannel.Blue, colorSpaces, hash.Substring(length + length, length));
     }
 
-    private PerceptualHash()
+    private PerceptualHash(ChannelPerceptualHash red, ChannelPerceptualHash green, ChannelPerceptualHash blue)
     {
-        _channels = new Dictionary<PixelChannel, ChannelPerceptualHash>();
+        _red = red;
+        _green = green;
+        _blue = blue;
     }
 
-    internal bool Isvalid
-    {
-        get
-        {
-            return _channels.ContainsKey(PixelChannel.Red) &&
-              _channels.ContainsKey(PixelChannel.Green) &&
-              _channels.ContainsKey(PixelChannel.Blue);
-        }
-    }
+    internal static ColorSpace[] DefaultColorSpaces { get; } = [ColorSpace.XyY, ColorSpace.HSB];
 
     /// <summary>
     /// Returns the perceptual hash for the specified channel.
     /// </summary>
-    /// <param name="channel">The channel to get the has for.</param>
+    /// <param name="channel">The channel to get the hash for.</param>
     /// <returns>The perceptual hash for the specified channel.</returns>
-    public IChannelPerceptualHash GetChannel(PixelChannel channel)
-    {
-        _channels.TryGetValue(channel, out var perceptualHash);
-        return perceptualHash;
-    }
+    public IChannelPerceptualHash? GetChannel(PixelChannel channel)
+        => channel switch
+        {
+            PixelChannel.Red => _red,
+            PixelChannel.Green => _green,
+            PixelChannel.Blue => _blue,
+            _ => null,
+        };
 
     /// <summary>
     /// Returns the sum squared difference between this hash and the other hash.
@@ -72,12 +72,19 @@ public sealed partial class PerceptualHash : IPerceptualHash
     /// <returns>The sum squared difference between this hash and the other hash.</returns>
     public double SumSquaredDistance(IPerceptualHash other)
     {
-        Throw.IfNull(nameof(other), other);
+        Throw.IfNull(other);
+
+        var red = other.GetChannel(PixelChannel.Red);
+        var green = other.GetChannel(PixelChannel.Green);
+        var blue = other.GetChannel(PixelChannel.Blue);
+
+        if (red is null || green is null || blue is null)
+            throw new NotSupportedException("The other perceptual hash should contain a red, green and blue channel.");
 
         return
-          _channels[PixelChannel.Red].SumSquaredDistance(other.GetChannel(PixelChannel.Red)) +
-          _channels[PixelChannel.Green].SumSquaredDistance(other.GetChannel(PixelChannel.Green)) +
-          _channels[PixelChannel.Blue].SumSquaredDistance(other.GetChannel(PixelChannel.Blue));
+          _red.SumSquaredDistance(red) +
+          _green.SumSquaredDistance(green) +
+          _blue.SumSquaredDistance(blue);
     }
 
     /// <summary>
@@ -85,11 +92,19 @@ public sealed partial class PerceptualHash : IPerceptualHash
     /// </summary>
     /// <returns>A <see cref="string"/>.</returns>
     public override string ToString()
+        => _red.ToString() +
+           _green.ToString() +
+           _blue.ToString();
+
+    internal static PerceptualHash? Create(IMagickImage image, ColorSpace[] colorSpaces, IntPtr list)
     {
-        return
-          _channels[PixelChannel.Red].ToString() +
-          _channels[PixelChannel.Green].ToString() +
-          _channels[PixelChannel.Blue].ToString();
+        if (list == IntPtr.Zero)
+            return null;
+
+        var red = CreateChannel(image, colorSpaces, list, PixelChannel.Red);
+        var green = CreateChannel(image, colorSpaces, list, PixelChannel.Green);
+        var blue = CreateChannel(image, colorSpaces, list, PixelChannel.Blue);
+        return new PerceptualHash(red, green, blue);
     }
 
     internal static void DisposeList(IntPtr list)
@@ -98,19 +113,16 @@ public sealed partial class PerceptualHash : IPerceptualHash
             NativePerceptualHash.DisposeList(list);
     }
 
-    private static ChannelPerceptualHash? CreateChannelPerceptualHash(MagickImage image, IntPtr list, PixelChannel channel)
+    internal static void ValidateColorSpaces(ColorSpace[] colorSpaces)
     {
-        var instance = NativePerceptualHash.GetInstance(image, list, channel);
-        if (instance == IntPtr.Zero)
-            return null;
-
-        return new ChannelPerceptualHash(channel, instance);
+        Throw.IfNull(colorSpaces);
+        Throw.IfOutOfRange(1, 6, colorSpaces.Length, nameof(colorSpaces), "Invalid number of colorspaces, the minimum is 1 and the maximum is 6.");
+        Throw.IfFalse(colorSpaces.Distinct().Count() == colorSpaces.Length, nameof(colorSpaces), "Specifying the same colorspace more than once is not allowed.");
     }
 
-    private void AddChannel(MagickImage image, IntPtr list, PixelChannel channel)
+    private static ChannelPerceptualHash CreateChannel(IMagickImage image, ColorSpace[] colorSpaces, IntPtr list, PixelChannel channel)
     {
-        var instance = CreateChannelPerceptualHash(image, list, channel);
-        if (instance is not null)
-            _channels.Add(instance.Channel, instance);
+        var nativeInstance = NativePerceptualHash.GetInstance(image, list, channel);
+        return new ChannelPerceptualHash(channel, colorSpaces, nativeInstance);
     }
 }

@@ -15,10 +15,9 @@ public sealed partial class OpenCLDevice : IOpenCLDevice
     private readonly NativeOpenCLDevice _instance;
     private bool _profileKernels;
 
-    private OpenCLDevice(IntPtr instance)
+    private OpenCLDevice(NativeOpenCLDevice instance)
     {
-        _instance = new NativeOpenCLDevice();
-        _instance.Instance = instance;
+        _instance = instance;
         _profileKernels = false;
     }
 
@@ -26,44 +25,41 @@ public sealed partial class OpenCLDevice : IOpenCLDevice
     /// Gets the benchmark score of the device.
     /// </summary>
     public double BenchmarkScore
-        => _instance.BenchmarkScore;
+        => _instance.BenchmarkScore_Get();
 
     /// <summary>
     /// Gets the type of the device.
     /// </summary>
     public OpenCLDeviceType DeviceType
-        => _instance.DeviceType;
+        => _instance.DeviceType_Get();
 
     /// <summary>
     /// Gets or sets a value indicating whether the device is enabled or disabled.
     /// </summary>
     public bool IsEnabled
     {
-        get => _instance.IsEnabled;
-        set => _instance.IsEnabled = value;
+        get => _instance.IsEnabled_Get();
+        set => _instance.IsEnabled_Set(value);
     }
 
     /// <summary>
     /// Gets all the kernel profile records for this devices.
     /// </summary>
     /// <returns>A <see cref="IEnumerable{OpenCLKernelProfileRecord}"/>.</returns>
-    public IReadOnlyCollection<IOpenCLKernelProfileRecord> KernelProfileRecords
+    public IReadOnlyList<IOpenCLKernelProfileRecord> KernelProfileRecords
     {
         get
         {
-            UIntPtr length;
-            var records = _instance.GetKernelProfileRecords(out length);
+            var records = _instance.GetKernelProfileRecords(out var length);
             var result = new Collection<IOpenCLKernelProfileRecord>();
 
             if (records == IntPtr.Zero)
                 return result;
 
-            for (var i = 0; i < (int)length; i++)
+            for (var i = 0U; i < length; i++)
             {
-                var instance = NativeOpenCLDevice.GetKernelProfileRecord(records, i);
-                var record = OpenCLKernelProfileRecord.CreateInstance(instance);
-                if (record is not null)
-                    result.Add(record);
+                var record = NativeOpenCLDevice.GetKernelProfileRecord(records, i);
+                result.Add(record);
             }
 
             return result;
@@ -74,7 +70,7 @@ public sealed partial class OpenCLDevice : IOpenCLDevice
     /// Gets the name of the device.
     /// </summary>
     public string Name
-        => _instance.Name;
+        => _instance.Name_Get();
 
     /// <summary>
     /// Gets or sets a value indicating whether kernel profiling is enabled.
@@ -94,13 +90,5 @@ public sealed partial class OpenCLDevice : IOpenCLDevice
     /// Gets the OpenCL version supported by the device.
     /// </summary>
     public string Version
-        => _instance.Version;
-
-    internal static OpenCLDevice? CreateInstance(IntPtr instance)
-    {
-        if (instance == IntPtr.Zero)
-            return null;
-
-        return new OpenCLDevice(instance);
-    }
+        => _instance.Version_Get();
 }

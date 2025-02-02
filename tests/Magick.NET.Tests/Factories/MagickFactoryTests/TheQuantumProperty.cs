@@ -1,7 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using ImageMagick;
+using ImageMagick.Factories;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -11,13 +11,13 @@ public partial class MagickFactoryTests
     public class TheQuantumInfoProperty
     {
         [Fact]
-        public void ShouldHaveTheCorrectDephValue()
+        public void ShouldHaveTheCorrectDepthValue()
         {
             var factory = new MagickFactory();
 #if Q8
-            Assert.Equal(8, factory.Quantum.Depth);
+            Assert.Equal(8U, factory.Quantum.Depth);
 #else
-            Assert.Equal(16, factory.Quantum.Depth);
+            Assert.Equal(16U, factory.Quantum.Depth);
 #endif
         }
 

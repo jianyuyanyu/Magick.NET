@@ -29,24 +29,24 @@ public interface IMagickNET
     string Features { get; }
 
     /// <summary>
-    /// Gets the information about the supported formats.
-    /// </summary>
-    IReadOnlyCollection<IMagickFormatInfo> SupportedFormats { get; }
-
-    /// <summary>
     /// Gets the font families that are known by ImageMagick.
     /// </summary>
-    IReadOnlyCollection<string> FontFamilies { get; }
+    IReadOnlyList<string> FontFamilies { get; }
 
     /// <summary>
     /// Gets the font names that are known by ImageMagick.
     /// </summary>
-    IReadOnlyCollection<string> FontNames { get; }
+    IReadOnlyList<string> FontNames { get; }
 
     /// <summary>
     /// Gets the version of ImageMagick.
     /// </summary>
     string ImageMagickVersion { get; }
+
+    /// <summary>
+    /// Gets information about the supported formats.
+    /// </summary>
+    IReadOnlyCollection<IMagickFormatInfo> SupportedFormats { get; }
 
     /// <summary>
     /// Gets the version of Magick.NET.
@@ -58,7 +58,7 @@ public interface IMagickNET
     /// </summary>
     /// <param name="name">The name of the environment variable.</param>
     /// <returns>The environment variable with the specified name.</returns>
-    string GetEnvironmentVariable(string name);
+    string? GetEnvironmentVariable(string name);
 
     /// <summary>
     /// Initializes ImageMagick.
@@ -136,7 +136,7 @@ public interface IMagickNET
     /// log.xml file.
     /// </summary>
     /// <param name="events">The events that will be logged.</param>
-    void SetLogEvents(LogEvents events);
+    void SetLogEvents(LogEventTypes events);
 
     /// <summary>
     /// Sets the directory that contains the Native library. This currently only works on Windows.
@@ -155,5 +155,5 @@ public interface IMagickNET
     /// Sets the pseudo-random number generator secret key.
     /// </summary>
     /// <param name="seed">The secret key.</param>
-    void SetRandomSeed(int seed);
+    void SetRandomSeed(ulong seed);
 }

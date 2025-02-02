@@ -20,14 +20,11 @@ public partial class MagickColorMatrixTests
             => TestThrowsException(2);
 
         [Fact]
-        public void ShoulddThrowExceptionWhenValuesIsNul()
+        public void ShouldThrowExceptionWhenValuesIsNull()
         {
             var matrix = new MagickColorMatrix(2);
 
-            Assert.Throws<ArgumentNullException>("values", () =>
-            {
-                matrix.SetColumn(0, null);
-            });
+            Assert.Throws<ArgumentNullException>("values", () => { matrix.SetColumn(0, null!); });
         }
 
         [Fact]
@@ -53,7 +50,7 @@ public partial class MagickColorMatrixTests
             });
         }
 
-        private void TestThrowsException(int x)
+        private static void TestThrowsException(int x)
         {
             var matrix = new MagickColorMatrix(2);
 

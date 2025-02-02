@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Drawing;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -13,7 +14,7 @@ public partial class MagickSettingsTests
         [Fact]
         public void ShouldDefaultToNull()
         {
-            using var image = new MagickImage(Files.Builtin.Logo);
+            using var image = new MagickImage();
 
             Assert.Null(image.Settings.Affine);
         }

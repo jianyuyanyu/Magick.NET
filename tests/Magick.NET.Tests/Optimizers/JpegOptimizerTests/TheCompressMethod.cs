@@ -13,30 +13,33 @@ public partial class JpegOptimizerTests
 {
     public class TheCompressMethod : JpegOptimizerTests
     {
-        [Fact]
-        public void ShouldCompress()
+        public class WithFileInfoFileNameOrStream : TheCompressMethod
         {
-            var result = AssertCompressSmaller(Files.ImageMagickJPG);
-            Assert.Equal(5146, result);
+            [Fact]
+            public void ShouldCompress()
+            {
+                var result = AssertCompressSmaller(Files.ImageMagickJPG);
+                Assert.Equal(5146, result);
+            }
+
+            [Fact]
+            public void ShouldTryToCompress()
+                => AssertCompressNotSmaller(Files.LetterJPG);
+
+            [Fact]
+            public void ShouldBeAbleToCompressFileTwoTimes()
+                => AssertCompressTwice(Files.ImageMagickJPG);
+
+            [Fact]
+            public void ShouldThrowExceptionWhenFileFormatIsInvalid()
+                => AssertCompressInvalidFileFormat(Files.CirclePNG);
         }
-
-        [Fact]
-        public void ShouldTryToCompress()
-            => AssertCompressNotSmaller(Files.LetterJPG);
-
-        [Fact]
-        public void ShouldBeAbleToCompressFileTwoTimes()
-            => AssertCompressTwice(Files.ImageMagickJPG);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenFileFormatIsInvalid()
-            => AssertCompressInvalidFileFormat(Files.CirclePNG);
 
         public class WithFileInfo : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileIsNull()
-                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null));
+                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null!));
 
             [Fact]
             public void ShouldResultInSmallerFileWHenQualityIsSetTo40()
@@ -47,14 +50,14 @@ public partial class JpegOptimizerTests
                 optimizer.Compress(tempFile.File);
 
                 var info = new MagickImageInfo(tempFile.File);
-                Assert.Equal(85, info.Quality);
+                Assert.Equal(85U, info.Quality);
 
                 FileHelper.Copy(Files.ImageMagickJPG, tempFile.File.FullName);
 
                 optimizer.Compress(tempFile.File, 40);
 
                 info = new MagickImageInfo(tempFile.File);
-                Assert.Equal(40, info.Quality);
+                Assert.Equal(40U, info.Quality);
             }
 
             [Fact]
@@ -100,7 +103,7 @@ public partial class JpegOptimizerTests
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsNull()
-                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null));
+                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsEmpty()
@@ -124,11 +127,11 @@ public partial class JpegOptimizerTests
             }
         }
 
-        public class WithStreamName : TheCompressMethod
+        public class WithStream : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNull()
-                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null));
+                => Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNotReadable()

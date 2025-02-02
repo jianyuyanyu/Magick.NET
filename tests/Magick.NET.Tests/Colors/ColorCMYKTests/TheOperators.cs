@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -61,7 +62,7 @@ public partial class ColorCMYKTests
         public void ShouldReturnTheCorrectValueWhenCastedFromMagickColor()
         {
             var expected = new ColorCMYK(Quantum.Max, 0, 0, 0);
-            var actual = (ColorCMYK)new MagickColor(Quantum.Max, 0, 0, 0, Quantum.Max);
+            var actual = (ColorCMYK?)new MagickColor(Quantum.Max, 0, 0, 0, Quantum.Max);
             Assert.Equal(expected, actual);
         }
     }

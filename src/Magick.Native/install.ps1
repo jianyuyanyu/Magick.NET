@@ -56,14 +56,12 @@ function copyToSamplesProjects($source, $target) {
 }
 
 function copyToTestProjectFolder($source, $target, $quantum, $platform, $configuration, $filename) {
-    [void](New-Item -ItemType directory -Force -Path "$target\$configuration$quantum\$platform\net462")
-    Copy-Item "$source\$fileName" "$target\$configuration$quantum\$platform\net462\$fileName"
+    [void](New-Item -ItemType directory -Force -Path "$target\$configuration$quantum\$platform\net472")
+    Copy-Item "$source\$fileName" "$target\$configuration$quantum\$platform\net472\$fileName"
 
     if ($platform -ne "AnyCPU") {
-        [void](New-Item -ItemType directory -Force -Path "$target\$configuration$quantum\$platform\net6")
-        Copy-Item "$source\$fileName" "$target\$configuration$quantum\$platform\net6\$fileName"
-        [void](New-Item -ItemType directory -Force -Path "$target\$configuration$quantum\$platform\net6-windows")
-        Copy-Item "$source\$fileName" "$target\$configuration$quantum\$platform\net6-windows\$fileName"
+        [void](New-Item -ItemType directory -Force -Path "$target\$configuration$quantum\$platform\net8.0")
+        Copy-Item "$source\$fileName" "$target\$configuration$quantum\$platform\net8.0\$fileName"
     }
 }
 
@@ -161,7 +159,12 @@ function createTrademarkAttribute($source, $target) {
 [assembly: System.Reflection.AssemblyTrademark(""ImageMagick $imageMagickVersion"")]"))
 }
 
-$version = [IO.File]::ReadAllText("$PSScriptRoot\Magick.Native.version").Trim()
+$version = [IO.File]::ReadAllText("$PSScriptRoot\Magick.Native.version")
+if ($version -ne $version.Trim()) {
+    Write-Error "Version contains whitespace"
+    Exit 1
+}
+
 $folder = "$PSScriptRoot\temp"
 $libraries = "$PSScriptRoot\libraries"
 $windowsLibraries = "$libraries\win"
@@ -174,6 +177,7 @@ copyMetadata $folder $PSScriptRoot
 copyLibraries $folder $libraries
 copyResources $folder $resources
 copyToTestProjects $windowsLibraries "$testsFolder\Magick.NET.Tests\bin"
+copyToTestProjects $windowsLibraries "$testsFolder\Magick.NET.AvaloniaMediaImaging.Tests\bin"
 copyToTestProjects $windowsLibraries "$testsFolder\Magick.NET.SystemDrawing.Tests\bin"
 copyToTestProjects $windowsLibraries "$testsFolder\Magick.NET.SystemWindowsMedia.Tests\bin"
 copyToSamplesProjects $windowsLibraries $samplesFolder

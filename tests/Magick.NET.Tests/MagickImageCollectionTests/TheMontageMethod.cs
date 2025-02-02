@@ -14,18 +14,21 @@ public partial class MagickImageCollectionTests
         [Fact]
         public void ShouldThrowExceptionWhenCollectionIsEmpty()
         {
+            var settings = new MontageSettings();
             using var images = new MagickImageCollection();
 
-            Assert.Throws<InvalidOperationException>(() => images.Montage(null));
+            Assert.Throws<InvalidOperationException>(() => images.Montage(settings));
         }
 
         [Fact]
         public void ShouldThrowExceptionWhenSettingsIsNull()
         {
-            using var images = new MagickImageCollection();
-            images.Add(new MagickImage(MagickColors.Magenta, 1, 1));
+            using var images = new MagickImageCollection
+            {
+                new MagickImage(MagickColors.Magenta, 1, 1),
+            };
 
-            Assert.Throws<ArgumentNullException>("settings", () => images.Montage(null));
+            Assert.Throws<ArgumentNullException>("settings", () => images.Montage(null!));
         }
 
         [Fact]
@@ -45,8 +48,8 @@ public partial class MagickImageCollectionTests
             using var montageResult = images.Montage(settings);
 
             Assert.NotNull(montageResult);
-            Assert.Equal(400, montageResult.Width);
-            Assert.Equal(1000, montageResult.Height);
+            Assert.Equal(400U, montageResult.Width);
+            Assert.Equal(1000U, montageResult.Height);
         }
     }
 }

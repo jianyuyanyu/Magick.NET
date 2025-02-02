@@ -31,7 +31,6 @@ public partial class TheWebPCoder
         using var output = new MagickImage(data);
 
         var profile = output.GetXmpProfile();
-
         Assert.NotNull(profile);
 
         var expectedProfile = @"
@@ -45,25 +44,28 @@ public partial class TheWebPCoder
          </rdf:Description>
     </rdf:RDF>
 </x:xmpmeta>";
-        Assert.Equal(expectedProfile, Encoding.UTF8.GetString(output.GetXmpProfile().ToByteArray()));
+        Assert.Equal(expectedProfile, Encoding.UTF8.GetString(profile.ToByteArray()));
     }
 
     [Fact]
-    public void ShouldUseTheUpdateXmpProfile()
+    public void ShouldUseTheUpdatedXmpProfile()
     {
         using var input = new MagickImage(Files.Builtin.Logo);
         input.SetProfile(new XmpProfile(_xmpData));
 
         input.Density = new Density(1234.5678, 5, DensityUnit.PixelsPerCentimeter);
-        input.Orientation = OrientationType.LeftBotom;
+        input.Orientation = OrientationType.LeftBottom;
 
         var data = input.ToByteArray(MagickFormat.WebP);
         using var output = new MagickImage(data);
 
+        var profile = output.GetXmpProfile();
+
+        Assert.NotNull(profile);
         Assert.Equal(1234.5678, output.Density.X);
         Assert.Equal(5, output.Density.Y);
         Assert.Equal(DensityUnit.PixelsPerCentimeter, output.Density.Units);
-        Assert.Equal(OrientationType.LeftBotom, output.Orientation);
+        Assert.Equal(OrientationType.LeftBottom, output.Orientation);
 
         var expectedProfile = @"
 <x:xmpmeta xmlns:x=""adobe:ns:meta/"" x:xmptk=""XMPTk 2.8"">
@@ -76,6 +78,6 @@ public partial class TheWebPCoder
          </rdf:Description>
     </rdf:RDF>
 </x:xmpmeta>";
-        Assert.Equal(expectedProfile, Encoding.UTF8.GetString(output.GetXmpProfile().ToByteArray()));
+        Assert.Equal(expectedProfile, Encoding.UTF8.GetString(profile.ToByteArray()));
     }
 }

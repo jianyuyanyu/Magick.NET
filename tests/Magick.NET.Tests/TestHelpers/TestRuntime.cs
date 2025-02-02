@@ -1,15 +1,26 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System.Runtime.InteropServices;
 using ImageMagick;
 
 namespace Magick.NET.Tests;
 
 internal static class TestRuntime
 {
-    public static bool HasFlakyLinuxArm64Result
-        => Runtime.IsLinux && Runtime.IsArm64;
+    static TestRuntime()
+    {
+        var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        var isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
-    public static bool HasFlakyMacOSResult
-        => Runtime.IsMacOS;
+        HasFlakyLinuxArm64Result = isLinux && Runtime.Architecture == Architecture.Arm64;
+        HasFlakyMacOSResult = isMacOS;
+        HasFlakyMacOSArm64Result = isMacOS && Runtime.Architecture == Architecture.Arm64;
+    }
+
+    public static bool HasFlakyLinuxArm64Result { get; }
+
+    public static bool HasFlakyMacOSResult { get; }
+
+    public static bool HasFlakyMacOSArm64Result { get; }
 }

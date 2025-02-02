@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
-using ImageMagick.Helpers;
 
 #if Q8
 using QuantumType = System.Byte;
@@ -18,7 +17,7 @@ namespace ImageMagick;
 
 internal static class QuantumConverter
 {
-    public static QuantumType[]? ToArray(IntPtr nativeData, int length)
+    public static QuantumType[]? ToArray(IntPtr nativeData, uint length)
     {
         if (nativeData == IntPtr.Zero)
             return null;

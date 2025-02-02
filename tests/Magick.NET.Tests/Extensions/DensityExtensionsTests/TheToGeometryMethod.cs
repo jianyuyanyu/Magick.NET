@@ -16,10 +16,12 @@ public partial class DensityExtensionsTests
             var density = new Density(50.0);
 
             var geometry = density.ToGeometry(0.5, 2.0);
+
+            Assert.NotNull(geometry);
             Assert.Equal(0, geometry.X);
             Assert.Equal(0, geometry.Y);
-            Assert.Equal(25, geometry.Width);
-            Assert.Equal(100, geometry.Height);
+            Assert.Equal(25U, geometry.Width);
+            Assert.Equal(100U, geometry.Height);
         }
     }
 }

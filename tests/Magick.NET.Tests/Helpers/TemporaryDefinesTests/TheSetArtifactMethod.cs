@@ -11,7 +11,7 @@ public partial class TemporaryDefinesTests
     public class TheSetArtifactMethod
     {
         [Fact]
-        public void ShouldSetArtificatWhenValueIsNotNull()
+        public void ShouldSetArtifactWhenValueIsNotNull()
         {
             using var image = new MagickImage();
             using var temporaryDefines = new TemporaryDefines(image);
@@ -21,17 +21,17 @@ public partial class TemporaryDefinesTests
         }
 
         [Fact]
-        public void ShouldNotSetArtificatWhenValueIsNull()
+        public void ShouldNotSetArtifactWhenValueIsNull()
         {
             using var image = new MagickImage();
             using var temporaryDefines = new TemporaryDefines(image);
-            temporaryDefines.SetArtifact("foo", (string)null);
+            temporaryDefines.SetArtifact("foo", (string)null!);
 
             Assert.Null(image.GetArtifact("foo"));
         }
 
         [Fact]
-        public void ShouldNotSetArtificatWhenValueIsEmpty()
+        public void ShouldNotSetArtifactWhenValueIsEmpty()
         {
             using var image = new MagickImage();
             using var temporaryDefines = new TemporaryDefines(image);

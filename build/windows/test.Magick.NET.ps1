@@ -27,28 +27,29 @@ function runTests($quantumName, $platformName, $targetFramework, $project) {
 }
 
 function testMagickNET($quantumName, $platformName) {
-    runTests $quantumName $platformName "net462" "Magick.NET"
+    runTests $quantumName $platformName "net472" "Magick.NET"
 
     if ($platformName -ne "Any CPU") {
-        runTests $quantumName $platformName "net6" "Magick.NET"
+        runTests $quantumName $platformName "net8.0" "Magick.NET"
 
         if ($quantumName -like "*OpenMP*") {
             return
         }
 
-        runTests $quantumName $platformName "net6-windows" "Magick.NET.SystemDrawing"
-        runTests $quantumName $platformName "net6-windows" "Magick.NET.SystemWindowsMedia"
+        runTests $quantumName $platformName "net8.0" "Magick.NET.AvaloniaMediaImaging"
+        runTests $quantumName $platformName "net8.0" "Magick.NET.SystemDrawing"
+        runTests $quantumName $platformName "net8.0" "Magick.NET.SystemWindowsMedia"
     } else {
-        runTests "" $platformName "net462" "Magick.NET.Core"
-        runTests "" $platformName "net6" "Magick.NET.Core"
+        runTests "" $platformName "net472" "Magick.NET.Core"
+        runTests "" $platformName "net8.0" "Magick.NET.Core"
     }
 
     if ($quantumName -like "*OpenMP*") {
         return
     }
 
-    runTests $quantumName $platformName "net462" "Magick.NET.SystemDrawing"
-    runTests $quantumName $platformName "net462" "Magick.NET.SystemWindowsMedia"
+    runTests $quantumName $platformName "net472" "Magick.NET.SystemDrawing"
+    runTests $quantumName $platformName "net472" "Magick.NET.SystemWindowsMedia"
 }
 
 testMagickNET $quantumName $platformName

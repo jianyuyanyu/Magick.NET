@@ -1,7 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-namespace ImageMagick;
+namespace ImageMagick.Factories;
 
 /// <summary>
 /// Class that can be used to create various matrix instances.
@@ -13,7 +13,7 @@ public sealed class MatrixFactory : IMatrixFactory
     /// </summary>
     /// <returns>A new <see cref="IMagickColorMatrix"/> instance.</returns>
     /// <param name="order">The order (1 to 6).</param>
-    public IMagickColorMatrix CreateColorMatrix(int order)
+    public IMagickColorMatrix CreateColorMatrix(uint order)
          => new MagickColorMatrix(order);
 
     /// <summary>
@@ -22,7 +22,7 @@ public sealed class MatrixFactory : IMatrixFactory
     /// <returns>A new <see cref="IMagickColorMatrix"/> instance.</returns>
     /// <param name="order">The order (1 to 6).</param>
     /// <param name="values">The values to initialize the matrix with.</param>
-    public IMagickColorMatrix CreateColorMatrix(int order, params double[] values)
+    public IMagickColorMatrix CreateColorMatrix(uint order, params double[] values)
         => new MagickColorMatrix(order, values);
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class MatrixFactory : IMatrixFactory
     /// </summary>
     /// <returns>A new <see cref="IConvolveMatrix"/> instance.</returns>
     /// <param name="order">The order (odd number).</param>
-    public IConvolveMatrix CreateConvolveMatrix(int order)
+    public IConvolveMatrix CreateConvolveMatrix(uint order)
         => new ConvolveMatrix(order);
 
     /// <summary>
@@ -39,6 +39,6 @@ public sealed class MatrixFactory : IMatrixFactory
     /// <returns>A new <see cref="IConvolveMatrix"/> instance.</returns>
     /// <param name="order">The order (odd number).</param>
     /// <param name="values">The values to initialize the matrix with.</param>
-    public IConvolveMatrix CreateConvolveMatrix(int order, params double[] values)
+    public IConvolveMatrix CreateConvolveMatrix(uint order, params double[] values)
         => new ConvolveMatrix(order, values);
 }

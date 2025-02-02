@@ -17,8 +17,8 @@ public partial class MagickImageTests
             image.BorderColor = MagickColors.Green;
             image.Border(3);
 
-            Assert.Equal(7, image.Width);
-            Assert.Equal(7, image.Height);
+            Assert.Equal(7U, image.Width);
+            Assert.Equal(7U, image.Height);
             ColorAssert.Equal(MagickColors.Green, image, 1, 1);
         }
 
@@ -28,8 +28,8 @@ public partial class MagickImageTests
             using var image = new MagickImage("xc:red", 1, 1);
             image.Border(3, 0);
 
-            Assert.Equal(7, image.Width);
-            Assert.Equal(1, image.Height);
+            Assert.Equal(7U, image.Width);
+            Assert.Equal(1U, image.Height);
         }
 
         [Fact]
@@ -38,8 +38,8 @@ public partial class MagickImageTests
             using var image = new MagickImage("xc:red", 1, 1);
             image.Border(0, 3);
 
-            Assert.Equal(1, image.Width);
-            Assert.Equal(7, image.Height);
+            Assert.Equal(1U, image.Width);
+            Assert.Equal(7U, image.Height);
         }
 
         [Fact]
@@ -49,8 +49,8 @@ public partial class MagickImageTests
             image.BorderColor = MagickColors.Green;
             image.Border(new Percentage(10));
 
-            Assert.Equal(12, image.Width);
-            Assert.Equal(24, image.Height);
+            Assert.Equal(12U, image.Width);
+            Assert.Equal(24U, image.Height);
             ColorAssert.Equal(MagickColors.Green, image, 1, 1);
             ColorAssert.Equal(MagickColors.Red, image, 1, 2);
             ColorAssert.Equal(MagickColors.Red, image, 10, 21);

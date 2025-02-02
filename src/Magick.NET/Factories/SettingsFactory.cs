@@ -11,7 +11,7 @@ using QuantumType = System.Single;
 #error Not implemented!
 #endif
 
-namespace ImageMagick;
+namespace ImageMagick.Factories;
 
 /// <summary>
 /// Class that can be used to create various settings.
@@ -21,16 +21,18 @@ public sealed class SettingsFactory : ISettingsFactory<QuantumType>
     /// <summary>
     /// Initializes a new instance that implements <see cref="ICompareSettings{TQuantumType}"/>.
     /// </summary>
+    /// <param name="metric">The error metric to use.</param>
     /// <returns>A new <see cref="ICompareSettings{TQuantumType}"/> instance.</returns>
-    public ICompareSettings<QuantumType> CreateCompareSettings()
-        => new CompareSettings();
+    public ICompareSettings<QuantumType> CreateCompareSettings(ErrorMetric metric)
+        => new CompareSettings(metric);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IComplexSettings"/>.
     /// </summary>
+    /// <param name="complexOperator">The complex operator to use.</param>
     /// <returns>A new <see cref="IComplexSettings"/> instance.</returns>
-    public IComplexSettings CreateComplexSettings()
-        => new ComplexSettings();
+    public IComplexSettings CreateComplexSettings(ComplexOperator complexOperator)
+        => new ComplexSettings(complexOperator);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IConnectedComponentsSettings"/>.
@@ -40,18 +42,12 @@ public sealed class SettingsFactory : ISettingsFactory<QuantumType>
         => new ConnectedComponentsSettings();
 
     /// <summary>
-    /// Initializes a new instance that implements <see cref="IDeskewSettings"/>.
-    /// </summary>
-    /// <returns>A new <see cref="IDeskewSettings"/> instance.</returns>
-    public IDeskewSettings CreateDeskewSettings()
-        => new DeskewSettings();
-
-    /// <summary>
     /// Initializes a new instance that implements <see cref="IDistortSettings"/>.
     /// </summary>
+    /// <param name="method">The distort method to use.</param>
     /// <returns>A new <see cref="IDistortSettings"/> instance.</returns>
-    public IDistortSettings CreateDistortSettings()
-        => new DistortSettings();
+    public IDistortSettings CreateDistortSettings(DistortMethod method)
+        => new DistortSettings(method);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IKmeansSettings"/>.

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace ImageMagick;
+namespace ImageMagick.Factories;
 
 /// <summary>
 /// Class that can be used to create various settings.
@@ -15,14 +15,16 @@ public interface ISettingsFactory<TQuantumType>
     /// <summary>
     /// Initializes a new instance that implements <see cref="ICompareSettings{TQuantumType}"/>.
     /// </summary>
+    /// <param name="metric">The error metric to use.</param>
     /// <returns>A new <see cref="ICompareSettings{TQuantumType}"/> instance.</returns>
-    ICompareSettings<TQuantumType> CreateCompareSettings();
+    ICompareSettings<TQuantumType> CreateCompareSettings(ErrorMetric metric);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IComplexSettings"/>.
     /// </summary>
+    /// <param name="complexOperator">The complex operator to use.</param>
     /// <returns>A new <see cref="IComplexSettings"/> instance.</returns>
-    IComplexSettings CreateComplexSettings();
+    IComplexSettings CreateComplexSettings(ComplexOperator complexOperator);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IConnectedComponentsSettings"/>.
@@ -31,16 +33,11 @@ public interface ISettingsFactory<TQuantumType>
     IConnectedComponentsSettings CreateConnectedComponentsSettings();
 
     /// <summary>
-    /// Initializes a new instance that implements <see cref="IDeskewSettings"/>.
-    /// </summary>
-    /// <returns>A new <see cref="IDeskewSettings"/> instance.</returns>
-    IDeskewSettings CreateDeskewSettings();
-
-    /// <summary>
     /// Initializes a new instance that implements <see cref="IDistortSettings"/>.
     /// </summary>
+    /// <param name="method">The distort method to use.</param>
     /// <returns>A new <see cref="IDistortSettings"/> instance.</returns>
-    IDistortSettings CreateDistortSettings();
+    IDistortSettings CreateDistortSettings(DistortMethod method);
 
     /// <summary>
     /// Initializes a new instance that implements <see cref="IKmeansSettings"/>.

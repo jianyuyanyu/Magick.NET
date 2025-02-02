@@ -1,7 +1,6 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using System;
 using System.Globalization;
 
 #if Q8
@@ -64,17 +63,17 @@ public sealed class MagickReadSettings : MagickSettings, IMagickReadSettings<Qua
     /// <summary>
     /// Gets or sets the index of the image to read from a multi layer/frame image.
     /// </summary>
-    public int? FrameIndex { get; set; }
+    public uint? FrameIndex { get; set; }
 
     /// <summary>
     /// Gets or sets the number of images to read from a multi layer/frame image.
     /// </summary>
-    public int? FrameCount { get; set; }
+    public uint? FrameCount { get; set; }
 
     /// <summary>
     /// Gets or sets the height.
     /// </summary>
-    public int? Height { get; set; }
+    public uint? Height { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the exif profile should be used to update some of the
@@ -112,7 +111,8 @@ public sealed class MagickReadSettings : MagickSettings, IMagickReadSettings<Qua
 
     /// <summary>
     /// Gets or sets a value indicating whether the monochrome reader shoul be used. This is
-    /// supported by: PCL, PDF, PS and XPS.
+    /// supported by: <see cref="MagickFormat.Pcl"/>, <see cref="MagickFormat.Pdf"/> ,
+    /// <see cref="MagickFormat.Ps"/>  and <see cref="MagickFormat.Xps"/>.
     /// </summary>
     public bool UseMonochrome
     {
@@ -123,7 +123,7 @@ public sealed class MagickReadSettings : MagickSettings, IMagickReadSettings<Qua
     /// <summary>
     /// Gets or sets the width.
     /// </summary>
-    public int? Width { get; set; }
+    public uint? Width { get; set; }
 
     internal void ForceSingleFrame()
     {
@@ -136,20 +136,7 @@ public sealed class MagickReadSettings : MagickSettings, IMagickReadSettings<Qua
         if (define.Format == MagickFormat.Unknown)
             return define.Name;
 
-        return Enum.GetName(define.Format.GetType(), define.Format) + ":" + define.Name;
-    }
-
-    private string? GetScenes()
-    {
-        if (!FrameIndex.HasValue && (!FrameCount.HasValue || FrameCount.Value == 1))
-            return null;
-
-        if (FrameIndex.HasValue && (!FrameCount.HasValue || FrameCount.Value == 1))
-            return FrameIndex.Value.ToString(CultureInfo.InvariantCulture);
-
-        var frame = FrameIndex ?? 0;
-        var count = FrameCount ?? 1;
-        return string.Format(CultureInfo.InvariantCulture, "{0}-{1}", frame, frame + count);
+        return EnumHelper.GetName(define.Format) + ":" + define.Name;
     }
 
     private void ApplyDefines()
@@ -178,9 +165,13 @@ public sealed class MagickReadSettings : MagickSettings, IMagickReadSettings<Qua
         if (!FrameIndex.HasValue && !FrameCount.HasValue)
             return;
 
-        Scenes = GetScenes();
         Scene = FrameIndex ?? 0;
         NumberScenes = FrameCount ?? 1;
+
+        if (FrameIndex.HasValue && (!FrameCount.HasValue || FrameCount.Value == 1))
+            Scenes = FrameIndex.Value.ToString(CultureInfo.InvariantCulture);
+        else
+            Scenes = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", Scene, Scene + NumberScenes);
     }
 
     private void Copy(IMagickReadSettings<QuantumType> settings)

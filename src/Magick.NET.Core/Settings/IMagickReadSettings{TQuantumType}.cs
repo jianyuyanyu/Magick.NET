@@ -25,17 +25,17 @@ public interface IMagickReadSettings<TQuantumType> : IMagickSettings<TQuantumTyp
     /// <summary>
     /// Gets or sets the index of the image to read from a multi layer/frame image.
     /// </summary>
-    int? FrameIndex { get; set; }
+    uint? FrameIndex { get; set; }
 
     /// <summary>
     /// Gets or sets the number of images to read from a multi layer/frame image.
     /// </summary>
-    int? FrameCount { get; set; }
+    uint? FrameCount { get; set; }
 
     /// <summary>
     /// Gets or sets the height.
     /// </summary>
-    int? Height { get; set; }
+    uint? Height { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the exif profile should be used to update some of the
@@ -45,12 +45,13 @@ public interface IMagickReadSettings<TQuantumType> : IMagickSettings<TQuantumTyp
 
     /// <summary>
     /// Gets or sets a value indicating whether the monochrome reader shoul be used. This is
-    /// supported by: PCL, PDF, PS and XPS.
+    /// supported by: <see cref="MagickFormat.Pcl"/>, <see cref="MagickFormat.Pdf"/> ,
+    /// <see cref="MagickFormat.Ps"/>  and <see cref="MagickFormat.Xps"/>.
     /// </summary>
     bool UseMonochrome { get; set; }
 
     /// <summary>
     /// Gets or sets the width.
     /// </summary>
-    int? Width { get; set; }
+    uint? Width { get; set; }
 }

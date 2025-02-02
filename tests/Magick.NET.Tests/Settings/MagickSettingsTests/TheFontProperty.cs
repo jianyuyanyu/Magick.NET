@@ -11,6 +11,14 @@ public partial class MagickSettingsTests
     public class TheFontProperty
     {
         [Fact]
+        public void ShouldDefaultToNull()
+        {
+            using var image = new MagickImage();
+
+            Assert.Null(image.Settings.Font);
+        }
+
+        [Fact]
         public void ShouldSetTheFontWhenReadingImage()
         {
             if (TestRuntime.HasFlakyMacOSResult)
@@ -24,8 +32,8 @@ public partial class MagickSettingsTests
             image.Settings.FontPointsize = 40;
             image.Read("pango:Test");
 
-            Assert.Equal(128, image.Width);
-            Assert.Contains(image.Height, new[] { 58, 62 });
+            Assert.Equal(128U, image.Width);
+            Assert.Contains(image.Height, new[] { 58U, 62U });
             ColorAssert.Equal(MagickColors.Black, image, 26, 22);
         }
     }

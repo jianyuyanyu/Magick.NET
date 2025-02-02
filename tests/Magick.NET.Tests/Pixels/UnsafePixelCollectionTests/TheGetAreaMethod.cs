@@ -1,7 +1,6 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
-using System;
 using ImageMagick;
 using Xunit;
 
@@ -12,36 +11,20 @@ public partial class UnsafePixelCollectionTests
     public class TheGetAreaMethod
     {
         [Fact]
-        public void ShouldThrowExceptionWhen32BitAndXTooLow()
-            => ThrowsOverflowExceptionWhen32Bit(-1, 0, 1, 1);
+        public void ShouldTNothrowExceptionWhenXTooLow()
+            => ThrowsNoException(-1, 0, 1, 1);
 
         [Fact]
         public void ShouldNotThrowExceptionWhenXTooHigh()
             => ThrowsNoException(6, 0, 1, 1);
 
         [Fact]
-        public void ShouldThrowExceptionWhen32BitAndYTooLow()
-            => ThrowsOverflowExceptionWhen32Bit(0, -1, 1, 1);
+        public void ShouldNotThrowExceptionWhenYTooLow()
+            => ThrowsNoException(0, -1, 1, 1);
 
         [Fact]
         public void ShouldNotThrowExceptionWhenYTooHigh()
             => ThrowsNoException(0, 11, 1, 1);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenWidthTooLow()
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                Assert.Throws<MagickImageErrorException>(() => pixels.GetArea(0, 0, -1, 1));
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetArea(0, 0, -1, 1));
-            }
-        }
 
         [Fact]
         public void ShouldThrowExceptionWhenWidthZero()
@@ -50,22 +33,6 @@ public partial class UnsafePixelCollectionTests
             using var pixels = image.GetPixelsUnsafe();
 
             Assert.Throws<MagickCacheErrorException>(() => pixels.GetArea(0, 0, 0, 1));
-        }
-
-        [Fact]
-        public void ShouldThrowExceptionWhenHeightTooLow()
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                Assert.Throws<MagickImageErrorException>(() => pixels.GetArea(0, 0, 1, -1));
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetArea(0, 0, 1, -1));
-            }
         }
 
         [Fact]
@@ -91,6 +58,9 @@ public partial class UnsafePixelCollectionTests
             using var image = new MagickImage(Files.CirclePNG);
             using var pixels = image.GetPixelsUnsafe();
             var area = pixels.GetArea(28, 28, 2, 3);
+
+            Assert.NotNull(area);
+
             var length = 2 * 3 * 4; // width * height * channelCount
             var color = new MagickColor(area[0], area[1], area[2], area[3]);
 
@@ -103,7 +73,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.RedPNG);
             using var pixels = image.GetPixelsUnsafe();
-            var area = pixels.GetArea(null);
+            var area = pixels.GetArea(null!);
 
             Assert.Null(area);
         }
@@ -114,6 +84,9 @@ public partial class UnsafePixelCollectionTests
             using var image = new MagickImage(Files.RedPNG);
             using var pixels = image.GetPixelsUnsafe();
             var area = pixels.GetArea(new MagickGeometry(0, 0, 6, 5));
+
+            Assert.NotNull(area);
+
             var length = 6 * 5 * 4; // width * height * channelCount
             var color = new MagickColor(area[0], area[1], area[2], area[3]);
 
@@ -121,22 +94,7 @@ public partial class UnsafePixelCollectionTests
             ColorAssert.Equal(MagickColors.Red, color);
         }
 
-        private static void ThrowsOverflowExceptionWhen32Bit(int x, int y, int width, int height)
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                pixels.GetArea(x, y, width, height);
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetArea(x, y, width, height));
-            }
-        }
-
-        private static void ThrowsNoException(int x, int y, int width, int height)
+        private static void ThrowsNoException(int x, int y, uint width, uint height)
         {
             using var image = new MagickImage(MagickColors.Red, 5, 10);
             using var pixels = image.GetPixelsUnsafe();

@@ -3,6 +3,7 @@
 
 using System;
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -14,56 +15,66 @@ public partial class ColorCMYKTests
         [Fact]
         public void ShouldThrowExceptionWhenColorIsNull()
         {
-            Assert.Throws<ArgumentNullException>("color", () =>
-            {
-                new ColorCMYK(null);
-            });
+            Assert.Throws<ArgumentNullException>("color", () => { new ColorCMYK(null!); });
         }
 
         [Fact]
         public void ShouldThrowExceptionWhenColorIsEmpty()
         {
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK(string.Empty);
-            });
+            Assert.Throws<ArgumentException>("color", () => { new ColorCMYK(string.Empty); });
         }
 
         [Fact]
         public void ShouldThrowExceptionWhenColorDoesNotStartWithHash()
         {
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK("FFFFFF");
-            });
+            Assert.Throws<ArgumentException>("color", () => { new ColorCMYK("FFFFFF"); });
         }
 
         [Fact]
         public void ShouldThrowExceptionWhenColorHasInvalidLength()
         {
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK("#FFFFF");
-            });
+            Assert.Throws<ArgumentException>("color", () => { new ColorCMYK("#FFFFF"); });
+        }
+
+#if !Q16HDRI
+        [Fact]
+        public void ShouldThrowExceptionWhenCyanPercentageIsNegative()
+        {
+            Assert.Throws<ArgumentException>("cyan", () => { new ColorCMYK(new Percentage(-1), new Percentage(0), new Percentage(0), new Percentage(0)); });
         }
 
         [Fact]
-        public void ShouldThrowExceptionWhenColorHasInvalidHexValue()
+        public void ShouldThrowExceptionWhenMagentaPercentageIsNegative()
         {
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK("#FGF");
-            });
+            Assert.Throws<ArgumentException>("magenta", () => { new ColorCMYK(new Percentage(0), new Percentage(-1), new Percentage(0), new Percentage(0)); });
+        }
 
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK("#GGFFFF");
-            });
+        [Fact]
+        public void ShouldThrowExceptionWhenYellowPercentageIsNegative()
+        {
+            Assert.Throws<ArgumentException>("yellow", () => { new ColorCMYK(new Percentage(0), new Percentage(0), new Percentage(-1), new Percentage(0)); });
+        }
 
-            Assert.Throws<ArgumentException>("color", () =>
-            {
-                new ColorCMYK("#FFFG000000000000");
-            });
+        [Fact]
+        public void ShouldThrowExceptionWhenKeyPercentageIsNegative()
+        {
+            Assert.Throws<ArgumentException>("key", () => { new ColorCMYK(new Percentage(0), new Percentage(0), new Percentage(0), new Percentage(-1)); });
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenColorAlphaPercentageIsNegative()
+        {
+            Assert.Throws<ArgumentException>("alpha", () => { new ColorCMYK(new Percentage(0), new Percentage(0), new Percentage(0), new Percentage(0), new Percentage(-1)); });
+        }
+#endif
+
+        [Theory]
+        [InlineData("#FGF")]
+        [InlineData("#GGFFFF")]
+        [InlineData("#FFFG000000000000")]
+        public void ShouldThrowExceptionWhenColorHasInvalidHexValue(string color)
+        {
+            Assert.Throws<ArgumentException>("color", () => { new ColorCMYK(color); });
         }
 
         [Fact]

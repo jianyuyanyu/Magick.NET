@@ -16,11 +16,11 @@ public partial class MagickImageTests
         {
             using var image = new MagickImage();
 
-            Assert.Throws<ArgumentNullException>("matrix", () => image.ColorMatrix(null));
+            Assert.Throws<ArgumentNullException>("matrix", () => image.ColorMatrix(null!));
         }
 
         [Fact]
-        public void SouldApplyTheSpecifiedColorMatrix()
+        public void ShouldApplyTheSpecifiedColorMatrix()
         {
             using var image = new MagickImage(Files.Builtin.Rose);
             var matrix = new MagickColorMatrix(3, 0, 0, 1, 0, 1, 0, 1, 0, 0);

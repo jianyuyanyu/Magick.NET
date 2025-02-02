@@ -16,10 +16,12 @@ public partial class ExifProfileTests
             using var image = new MagickImage(Files.FujiFilmFinePixS1ProJPG);
             var profile = image.GetExifProfile();
 
-            var before = profile.GetData();
+            Assert.NotNull(profile);
+
+            var before = profile.ToByteArray();
             profile.Rewrite();
 
-            var after = profile.GetData();
+            var after = profile.ToByteArray();
 
             Assert.NotNull(after);
             Assert.NotSame(before, after);

@@ -28,7 +28,7 @@ public partial class IptcProfileTests
         [InlineData(IptcTag.Contact)]
         [InlineData(IptcTag.LocalCaption)]
         [InlineData(IptcTag.CaptionWriter)]
-        public void ShouldAllowDuplicateValuesForValuesThatCanBeRepated(IptcTag tag)
+        public void ShouldAllowDuplicateValuesForValuesThatCanBeRepeated(IptcTag tag)
         {
             var profile = new IptcProfile();
             var expectedValue1 = "test";
@@ -77,7 +77,7 @@ public partial class IptcProfileTests
         [InlineData(IptcTag.Caption)]
         [InlineData(IptcTag.ImageType)]
         [InlineData(IptcTag.ImageOrientation)]
-        public void ShoulNotdAllowDuplicateValuesForValuesThatCannotBeRepated(IptcTag tag)
+        public void ShouldNotAllowDuplicateValuesForValuesThatCannotBeRepeated(IptcTag tag)
         {
             var profile = new IptcProfile();
             var expectedValue = "another one";
@@ -115,9 +115,11 @@ public partial class IptcProfileTests
 
             profile.SetValue(tag, datetime);
 
-            var actual = profile.GetValue(tag);
-            Assert.Equal("19940317", actual.Value);
-            Assert.Equal(8, actual.Length);
+            var value = profile.GetValue(tag);
+
+            Assert.NotNull(value);
+            Assert.Equal("19940317", value.Value);
+            Assert.Equal(8, value.Length);
         }
 
         [Theory]
@@ -133,8 +135,8 @@ public partial class IptcProfileTests
 
             profile.SetValue(tag, dateTimeOffset);
 
-            var actual = profile.GetAllValues(tag).First();
-            Assert.Equal("161516+0200", actual.Value);
+            var value = profile.GetAllValues(tag).First();
+            Assert.Equal("161516+0200", value.Value);
         }
     }
 }

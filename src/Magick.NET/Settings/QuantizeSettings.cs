@@ -20,7 +20,7 @@ public sealed partial class QuantizeSettings : IQuantizeSettings
     /// <summary>
     /// Gets or sets the maximum number of colors to quantize to.
     /// </summary>
-    public int Colors { get; set; }
+    public uint Colors { get; set; }
 
     /// <summary>
     /// Gets or sets the colorspace to quantize in.
@@ -40,11 +40,11 @@ public sealed partial class QuantizeSettings : IQuantizeSettings
     /// <summary>
     /// Gets or sets the quantization tree-depth.
     /// </summary>
-    public int TreeDepth { get; set; }
+    public uint TreeDepth { get; set; }
 
     private static INativeInstance CreateNativeInstance(IQuantizeSettings settings)
     {
-        var instance = new NativeQuantizeSettings();
+        var instance = NativeQuantizeSettings.Create();
         instance.SetColors(settings.Colors);
         instance.SetColorSpace(settings.ColorSpace);
         instance.SetDitherMethod(settings.DitherMethod ?? ImageMagick.DitherMethod.No);

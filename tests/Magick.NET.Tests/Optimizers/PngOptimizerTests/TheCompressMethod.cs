@@ -13,30 +13,33 @@ public partial class PngOptimizerTests
 {
     public class TheCompressMethod : PngOptimizerTests
     {
-        [Fact]
-        public void ShouldCompress()
+        public class WithFileInfoFileNameOrStream : TheCompressMethod
         {
-            var result = AssertCompressSmaller(Files.SnakewarePNG);
-            Assert.Equal(6922, result);
+            [Fact]
+            public void ShouldCompress()
+            {
+                var result = AssertCompressSmaller(Files.SnakewarePNG);
+                Assert.Equal(6922, result);
+            }
+
+            [Fact]
+            public void ShouldTryToCompress()
+                => AssertCompressNotSmaller(Files.MagickNETIconPNG);
+
+            [Fact]
+            public void ShouldBeAbleToCompressFileTwoTimes()
+                => AssertCompressTwice(Files.SnakewarePNG);
+
+            [Fact]
+            public void ShouldThrowExceptionWhenFileFormatIsInvalid()
+                => AssertCompressInvalidFileFormat(Files.ImageMagickJPG);
         }
-
-        [Fact]
-        public void ShouldTryToCompress()
-            => AssertCompressNotSmaller(Files.MagickNETIconPNG);
-
-        [Fact]
-        public void ShouldBeAbleToCompressFileTwoTimes()
-            => AssertCompressTwice(Files.SnakewarePNG);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenFileFormatIsInvalid()
-            => AssertCompressInvalidFileFormat(Files.ImageMagickJPG);
 
         public class WithFileInfo : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileIsNull()
-                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null));
+                => Assert.Throws<ArgumentNullException>("file", () => Optimizer.Compress((FileInfo)null!));
 
             [Fact]
             public void ShouldNotOptimizeAnimatedPNG()
@@ -74,7 +77,7 @@ public partial class PngOptimizerTests
         {
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsNull()
-                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null));
+                => Assert.Throws<ArgumentNullException>("fileName", () => Optimizer.Compress((string)null!));
 
             [Fact]
             public void ShouldThrowExceptionWhenFileNameIsEmpty()
@@ -88,12 +91,12 @@ public partial class PngOptimizerTests
             }
         }
 
-        public class WithStreamName : TheCompressMethod
+        public class WithStream : TheCompressMethod
         {
             [Fact]
             public void ShouldThrowExceptionWhenStreamIsNull()
             {
-                Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null));
+                Assert.Throws<ArgumentNullException>("stream", () => Optimizer.Compress((Stream)null!));
             }
 
             [Fact]

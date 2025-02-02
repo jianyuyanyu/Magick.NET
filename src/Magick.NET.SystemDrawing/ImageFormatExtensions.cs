@@ -2,27 +2,26 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 
 namespace ImageMagick;
 
 internal static class ImageFormatExtensions
 {
-    public static MagickFormat ToFormat(this ImageFormat self)
+    private static readonly Dictionary<Guid, MagickFormat> _formats = new()
     {
-        if (self == ImageFormat.Bmp || self == ImageFormat.MemoryBmp)
-            return MagickFormat.Bmp;
-        else if (self == ImageFormat.Gif)
-            return MagickFormat.Gif;
-        else if (self == ImageFormat.Icon)
-            return MagickFormat.Icon;
-        else if (self == ImageFormat.Jpeg)
-            return MagickFormat.Jpeg;
-        else if (self == ImageFormat.Png)
-            return MagickFormat.Png;
-        else if (self == ImageFormat.Tiff)
-            return MagickFormat.Tiff;
-        else
-            throw new NotSupportedException("Unsupported image format: " + self.ToString());
-    }
+        [ImageFormat.Bmp.Guid] = MagickFormat.Bmp,
+        [ImageFormat.MemoryBmp.Guid] = MagickFormat.Bmp,
+        [ImageFormat.Gif.Guid] = MagickFormat.Gif,
+        [ImageFormat.Icon.Guid] = MagickFormat.Icon,
+        [ImageFormat.Jpeg.Guid] = MagickFormat.Jpeg,
+        [ImageFormat.Png.Guid] = MagickFormat.Png,
+        [ImageFormat.Tiff.Guid] = MagickFormat.Tiff,
+    };
+
+    public static MagickFormat ToMagickFormat(this ImageFormat self)
+        => _formats.TryGetValue(self.Guid, out var format)
+            ? format
+            : throw new NotSupportedException($"Unsupported image format: {self}");
 }

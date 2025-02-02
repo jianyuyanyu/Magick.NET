@@ -18,7 +18,7 @@ public partial class MagickImageTests
             {
                 using var image = new MagickImage();
 
-                Assert.Throws<ArgumentNullException>("color", () => image.Colorize(null, new Percentage(50)));
+                Assert.Throws<ArgumentNullException>("color", () => image.Colorize(null!, new Percentage(50)));
             }
 
             [Fact]
@@ -42,14 +42,6 @@ public partial class MagickImageTests
         public class WithSeparatePercentages
         {
             [Fact]
-            public void ShouldThrowExceptionWhenColorIsNull()
-            {
-                using var image = new MagickImage();
-
-                Assert.Throws<ArgumentNullException>("color", () => image.Colorize(null, new Percentage(25), new Percentage(50), new Percentage(75)));
-            }
-
-            [Fact]
             public void ShouldThrowExceptionWhenAlphaRedIsNegative()
             {
                 using var image = new MagickImage();
@@ -71,6 +63,14 @@ public partial class MagickImageTests
                 using var image = new MagickImage();
 
                 Assert.Throws<ArgumentException>("alphaBlue", () => image.Colorize(MagickColors.Purple, new Percentage(25), new Percentage(50), new Percentage(-1)));
+            }
+
+            [Fact]
+            public void ShouldThrowExceptionWhenColorIsNull()
+            {
+                using var image = new MagickImage();
+
+                Assert.Throws<ArgumentNullException>("color", () => image.Colorize(null!, new Percentage(25), new Percentage(50), new Percentage(75)));
             }
 
             [Fact]

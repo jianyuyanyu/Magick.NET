@@ -9,7 +9,7 @@ namespace ImageMagick;
 /// <summary>
 /// Class that contains an image profile.
 /// </summary>
-public class ImageProfile : IImageProfile
+public partial class ImageProfile : IImageProfile
 {
     private byte[]? _data;
 
@@ -20,8 +20,8 @@ public class ImageProfile : IImageProfile
     /// <param name="data">A byte array containing the profile.</param>
     public ImageProfile(string name, byte[] data)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
-        Throw.IfNull(nameof(data), data);
+        Throw.IfNullOrEmpty(name);
+        Throw.IfNull(data);
 
         Name = name;
         _data = Copy(data);
@@ -34,7 +34,7 @@ public class ImageProfile : IImageProfile
     /// <param name="stream">A stream containing the profile.</param>
     public ImageProfile(string name, Stream stream)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
 
         Name = name;
 
@@ -49,8 +49,8 @@ public class ImageProfile : IImageProfile
     /// <param name="fileName">The fully qualified name of the profile file, or the relative profile file name.</param>
     public ImageProfile(string name, string fileName)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
-        Throw.IfNullOrEmpty(nameof(fileName), fileName);
+        Throw.IfNullOrEmpty(name);
+        Throw.IfNullOrEmpty(fileName);
 
         Name = name;
 
@@ -64,7 +64,7 @@ public class ImageProfile : IImageProfile
     /// <param name="name">The name of the profile.</param>
     protected ImageProfile(string name)
     {
-        Throw.IfNullOrEmpty(nameof(name), name);
+        Throw.IfNullOrEmpty(name);
         Name = name;
     }
 
@@ -116,13 +116,6 @@ public class ImageProfile : IImageProfile
     }
 
     /// <summary>
-    /// Returns the <see cref="byte"/> array of this profile.
-    /// </summary>
-    /// <returns>A <see cref="byte"/> array.</returns>
-    public byte[]? GetData()
-        => _data;
-
-    /// <summary>
     /// Serves as a hash of this type.
     /// </summary>
     /// <returns>A hash code for the current instance.</returns>
@@ -138,11 +131,18 @@ public class ImageProfile : IImageProfile
     /// Converts this instance to a <see cref="byte"/> array.
     /// </summary>
     /// <returns>A <see cref="byte"/> array.</returns>
-    public byte[]? ToByteArray()
+    public byte[] ToByteArray()
     {
         UpdateData();
         return Copy(_data);
     }
+
+    /// <summary>
+    /// Returns the <see cref="byte"/> array of this profile.
+    /// </summary>
+    /// <returns>A <see cref="byte"/> array.</returns>
+    protected byte[]? GetData()
+        => _data;
 
     /// <summary>
     /// Sets the data of the profile.

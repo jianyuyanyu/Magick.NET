@@ -53,7 +53,7 @@ public sealed class IcoOptimizer : IImageOptimizer
     public bool Compress(string fileName)
     {
         var filePath = FileHelper.CheckForBaseDirectory(fileName);
-        Throw.IfNullOrEmpty(nameof(fileName), filePath);
+        Throw.IfNullOrEmpty(filePath, nameof(fileName));
 
         return DoCompress(new FileInfo(filePath), false);
     }
@@ -76,7 +76,7 @@ public sealed class IcoOptimizer : IImageOptimizer
     /// <returns>True when the image could be compressed otherwise false.</returns>
     public bool LosslessCompress(FileInfo file)
     {
-        Throw.IfNull(nameof(file), file);
+        Throw.IfNull(file);
 
         return DoCompress(file, true);
     }
@@ -90,7 +90,7 @@ public sealed class IcoOptimizer : IImageOptimizer
     public bool LosslessCompress(string fileName)
     {
         var filePath = FileHelper.CheckForBaseDirectory(fileName);
-        Throw.IfNullOrEmpty(nameof(fileName), filePath);
+        Throw.IfNullOrEmpty(filePath, nameof(fileName));
 
         return DoCompress(new FileInfo(filePath), true);
     }
@@ -145,8 +145,11 @@ public sealed class IcoOptimizer : IImageOptimizer
     private static void FixAlpha(IMagickImage<QuantumType> image, QuantumType min, QuantumType max)
     {
         using var pixels = image.GetPixelsUnsafe();
-        var alphaIndex = pixels.GetIndex(PixelChannel.Alpha);
-        var channels = pixels.Channels;
+        var alphaIndex = pixels.GetChannelIndex(PixelChannel.Alpha);
+        if (alphaIndex is null)
+            return;
+
+        var channels = (int)pixels.Channels;
 
         for (var y = 0; y < image.Height; y++)
         {
@@ -154,7 +157,7 @@ public sealed class IcoOptimizer : IImageOptimizer
             if (row is null)
                 continue;
 
-            for (var i = alphaIndex; i < row.Length; i += channels)
+            for (var i = (int)alphaIndex; i < row.Length; i += channels)
             {
                 if (row[i] <= min)
                     row[i] = 0;

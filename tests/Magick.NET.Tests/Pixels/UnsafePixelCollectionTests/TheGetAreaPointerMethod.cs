@@ -22,36 +22,20 @@ public partial class UnsafePixelCollectionTests
     public class TheGetAreaPointerMethod
     {
         [Fact]
-        public void ShouldThrowExceptionWhen32BitAndXTooLow()
-            => ThrowsOverflowExceptionWhen32Bit(-1, 0, 1, 1);
+        public void ShouldNotThrowExceptionWhenXTooLow()
+            => ThrowsNoException(-1, 0, 1, 1);
 
         [Fact]
         public void ShouldNotThrowExceptionWhenXTooHigh()
             => ThrowsNoException(6, 0, 1, 1);
 
         [Fact]
-        public void ShouldThrowExceptionWhen32BitAndYTooLow()
-            => ThrowsOverflowExceptionWhen32Bit(0, -1, 1, 1);
+        public void ShouldNotThrowExceptionWhenYTooLow()
+            => ThrowsNoException(0, -1, 1, 1);
 
         [Fact]
         public void ShouldNotThrowExceptionWhenYTooHigh()
             => ThrowsNoException(0, 11, 1, 1);
-
-        [Fact]
-        public void ShouldThrowExceptionWhenWidthTooLow()
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                Assert.Throws<MagickImageErrorException>(() => pixels.GetArea(0, 0, -1, 1));
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetArea(0, 0, -1, 1));
-            }
-        }
 
         [Fact]
         public void ShouldThrowExceptionWhenWidthZero()
@@ -60,22 +44,6 @@ public partial class UnsafePixelCollectionTests
             using var pixels = image.GetPixelsUnsafe();
 
             Assert.Throws<MagickCacheErrorException>(() => pixels.GetAreaPointer(0, 0, 0, 1));
-        }
-
-        [Fact]
-        public void ShouldThrowExceptionWhenHeightTooLow()
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                Assert.Throws<MagickImageErrorException>(() => pixels.GetAreaPointer(0, 0, 1, -1));
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetAreaPointer(0, 0, 1, -1));
-            }
         }
 
         [Fact]
@@ -112,7 +80,7 @@ public partial class UnsafePixelCollectionTests
         {
             using var image = new MagickImage(Files.RedPNG);
             using var pixels = image.GetPixelsUnsafe();
-            var area = pixels.GetAreaPointer(null);
+            var area = pixels.GetAreaPointer(null!);
 
             Assert.Equal(area, IntPtr.Zero);
         }
@@ -129,22 +97,7 @@ public partial class UnsafePixelCollectionTests
             ColorAssert.Equal(MagickColors.Red, color);
         }
 
-        private static void ThrowsOverflowExceptionWhen32Bit(int x, int y, int width, int height)
-        {
-            using var image = new MagickImage(MagickColors.Red, 5, 10);
-            using var pixels = image.GetPixelsUnsafe();
-
-            if (Runtime.Is64Bit)
-            {
-                pixels.GetAreaPointer(x, y, width, height);
-            }
-            else
-            {
-                Assert.Throws<OverflowException>(() => pixels.GetAreaPointer(x, y, width, height));
-            }
-        }
-
-        private static void ThrowsNoException(int x, int y, int width, int height)
+        private static void ThrowsNoException(int x, int y, uint width, uint height)
         {
             using var image = new MagickImage(MagickColors.Red, 5, 10);
             using var pixels = image.GetPixelsUnsafe();

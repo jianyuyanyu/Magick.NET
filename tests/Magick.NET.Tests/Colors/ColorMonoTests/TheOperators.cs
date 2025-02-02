@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using ImageMagick;
+using ImageMagick.Colors;
 using Xunit;
 
 namespace Magick.NET.Tests;
@@ -60,7 +61,9 @@ public partial class ColorMonoTests
         [Fact]
         public void ShouldReturnTheCorrectValueWhenCastedFromMagickColor()
         {
-            var actual = (ColorMono)MagickColors.White;
+            var actual = (ColorMono?)MagickColors.White;
+
+            Assert.NotNull(actual);
             Assert.False(actual.IsBlack);
         }
     }

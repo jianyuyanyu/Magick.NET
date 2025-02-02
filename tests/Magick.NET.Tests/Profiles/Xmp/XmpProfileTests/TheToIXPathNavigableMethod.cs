@@ -19,9 +19,17 @@ public partial class XmpProfileTests
             Assert.NotNull(profile);
 
             var doc = profile.ToIXPathNavigable();
-            var xml = doc.CreateNavigator().OuterXml;
+
+            Assert.NotNull(doc);
+
+            var xml = doc.CreateNavigator()?.OuterXml;
 
             Assert.StartsWith(@"<?xpacket begin="""" id=""W5M0MpCehiHzreSzNTczkc9d""?>", xml);
+        }
+
+        [Fact]
+        public void ShouldReturnNullWhenTheProfileContainsNoData()
+        {
         }
     }
 }

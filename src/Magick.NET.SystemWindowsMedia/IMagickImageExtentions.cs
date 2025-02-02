@@ -35,7 +35,7 @@ public static partial class IMagickImageExtentions
     private static BitmapSource ToBitmapSource<TQuantumType>(this IMagickImage<TQuantumType> self, bool useDensity)
         where TQuantumType : struct, IConvertible
     {
-        Throw.IfNull(nameof(self), self);
+        Throw.IfNull(self);
 
         var image = self;
 
@@ -65,12 +65,12 @@ public static partial class IMagickImageExtentions
             }
 
             var step = format.BitsPerPixel / 8;
-            var stride = image.Width * step;
+            var stride = (int)image.Width * step;
 
             using var pixels = image.GetPixelsUnsafe();
             var bytes = pixels.ToByteArray(mapping);
             var dpi = GetDefaultDensity(image, useDensity ? DensityUnit.PixelsPerInch : DensityUnit.Undefined);
-            return BitmapSource.Create(image.Width, image.Height, dpi.X, dpi.Y, format, null, bytes, stride);
+            return BitmapSource.Create((int)image.Width, (int)image.Height, dpi.X, dpi.Y, format, null, bytes, stride);
         }
         finally
         {
@@ -81,9 +81,7 @@ public static partial class IMagickImageExtentions
 
     private static Density GetDefaultDensity(IMagickImage image, DensityUnit units)
     {
-        Throw.IfNull(nameof(image), image);
-
-        if (units == DensityUnit.Undefined || (image.Density.Units == DensityUnit.Undefined && image.Density.X == 0 && image.Density.Y == 0))
+        if (units == DensityUnit.Undefined || (image.Density.X <= 0 || image.Density.Y <= 0))
             return new Density(96);
 
         return image.Density.ChangeUnits(units);

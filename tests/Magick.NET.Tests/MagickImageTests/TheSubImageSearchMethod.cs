@@ -16,7 +16,7 @@ public partial class MagickImageTests
         {
             using var image = new MagickImage();
 
-            Assert.Throws<ArgumentNullException>("image", () => image.SubImageSearch(null));
+            Assert.Throws<ArgumentNullException>("image", () => image.SubImageSearch(null!));
         }
 
         [Fact]
@@ -35,8 +35,8 @@ public partial class MagickImageTests
             Assert.Equal(0.0, searchResult.SimilarityMetric);
             Assert.Equal(2, searchResult.BestMatch.X);
             Assert.Equal(0, searchResult.BestMatch.Y);
-            Assert.Equal(1, searchResult.BestMatch.Width);
-            Assert.Equal(1, searchResult.BestMatch.Height);
+            Assert.Equal(1U, searchResult.BestMatch.Width);
+            Assert.Equal(1U, searchResult.BestMatch.Height);
         }
     }
 }

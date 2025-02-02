@@ -5,7 +5,7 @@ using System;
 
 namespace ImageMagick;
 
-internal abstract class NativeInstance : NativeHelper, INativeInstance, IDisposable
+internal abstract class NativeInstance : NativeHelper, INativeInstance
 {
     private IntPtr _instance = IntPtr.Zero;
 
@@ -30,9 +30,6 @@ internal abstract class NativeInstance : NativeHelper, INativeInstance, IDisposa
             _instance = value;
         }
     }
-
-    public bool IsDisposed
-        => _instance == IntPtr.Zero;
 
     protected abstract string TypeName { get; }
 
