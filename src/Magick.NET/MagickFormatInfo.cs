@@ -17,15 +17,15 @@ public sealed partial class MagickFormatInfo : IMagickFormatInfo
 
     private MagickFormatInfo(NativeMagickFormatInfo instance)
     {
-        Format = GetFormat(instance.Format_Get());
-        Description = instance.Description_Get();
         CanReadMultithreaded = instance.CanReadMultithreaded_Get();
         CanWriteMultithreaded = instance.CanWriteMultithreaded_Get();
+        Description = instance.Description_Get();
+        Format = GetFormat(instance.Format_Get());
+        MimeType = instance.MimeType_Get();
+        ModuleFormat = GetFormat(instance.Module_Get());
         SupportsMultipleFrames = instance.SupportsMultipleFrames_Get();
         SupportsReading = instance.SupportsReading_Get();
         SupportsWriting = instance.SupportsWriting_Get();
-        MimeType = instance.MimeType_Get();
-        ModuleFormat = GetFormat(instance.Module_Get());
         Version = instance.Version_Get();
     }
 
