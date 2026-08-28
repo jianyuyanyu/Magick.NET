@@ -98,6 +98,8 @@ public partial class AsyncStreamWrapperTest
 
             using var cancellationTokenSource = new CancellationTokenSource();
 
+            var count = 42L;
+
             unsafe void ReadSync()
             {
                 cancellationTokenSource.Cancel();
@@ -105,11 +107,13 @@ public partial class AsyncStreamWrapperTest
                 var buffer = new byte[10];
                 fixed (byte* p = buffer)
                 {
-                    wrapper.Read((IntPtr)p, (UIntPtr)10, IntPtr.Zero);
+                    count = wrapper.Read((IntPtr)p, (UIntPtr)10, IntPtr.Zero);
                 }
             }
 
             await Assert.ThrowsAsync<OperationCanceledException>(() => wrapper.ReadAsync(ReadSync, cancellationTokenSource.Token));
+
+            Assert.Equal(-1, count);
         }
 
         [Fact]
