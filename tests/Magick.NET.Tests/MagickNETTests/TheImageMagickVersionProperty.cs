@@ -12,7 +12,7 @@ public partial class MagickNETTests
     public partial class TheImageMagickVersionProperty
     {
         [Fact]
-        public void ShoudlReturnTheCorrectValue()
+        public void ShouldReturnTheCorrectValue()
         {
             var version = "7.1.2-29";
             var architecture = Runtime.IsWindows
