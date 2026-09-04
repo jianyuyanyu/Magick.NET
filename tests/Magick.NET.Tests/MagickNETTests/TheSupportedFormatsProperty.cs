@@ -61,36 +61,6 @@ public partial class MagickNETTests
         }
 
         [Fact]
-        public void ShouldContainMostFormats()
-        {
-            var missingFormats = new List<MagickFormat>();
-            foreach (var format in Enum.GetValues(typeof(MagickFormat)).OfType<MagickFormat>())
-            {
-                if (format == MagickFormat.Unknown)
-                    continue;
-
-                var formatInfo = MagickNET.SupportedFormats
-                    .SingleOrDefault(f => f.Format == format);
-
-                switch (format)
-                {
-                    case MagickFormat.Sun:
-                    case MagickFormat.Ras:
-                        if (formatInfo is not null)
-                            Assert.Fail($"Format {format} should not be supported.");
-                        break;
-                    default:
-                        if (formatInfo is null)
-                            missingFormats.Add(format);
-                        break;
-                }
-            }
-
-            if (missingFormats.Count > 0)
-                Assert.Fail($"Missing formats: {string.Join(", ", missingFormats)}");
-        }
-
-        [Fact]
         public void ShouldReturnTheFormatsWithTheCorrectSettings()
         {
             foreach (var formatInfo in MagickNET.SupportedFormats)
@@ -2099,5 +2069,50 @@ public partial class MagickNETTests
                 }
             }
         }
+
+        [Fact]
+        public void ShouldContainMostFormats()
+        {
+            var missingFormats = new List<MagickFormat>();
+            foreach (var format in Enum.GetValues(typeof(MagickFormat)).OfType<MagickFormat>())
+            {
+                if (format == MagickFormat.Unknown)
+                    continue;
+
+                var formatInfo = MagickNET.SupportedFormats
+                    .SingleOrDefault(f => f.Format == format);
+
+                switch (format)
+                {
+                    // These formats are disabled by the policy in our unit test environment.
+                    // They are supported by ImageMagick, but not in our unit tests.
+                    case MagickFormat.Sun:
+                    case MagickFormat.Ras:
+                        FormatShouldNotBeSupported(format, formatInfo);
+                        break;
+                    case MagickFormat.Clipboard:
+                    case MagickFormat.Emf:
+                    case MagickFormat.Wmf:
+                        if (Runtime.IsWindows)
+                            FormatShouldBeSupported(format, formatInfo);
+                        else
+                            FormatShouldNotBeSupported(format, formatInfo);
+                        break;
+                    default:
+                        if (formatInfo is null)
+                            missingFormats.Add(format);
+                        break;
+                }
+            }
+
+            if (missingFormats.Count > 0)
+                Assert.Fail($"Missing formats: {string.Join(", ", missingFormats)}");
+        }
+
+        private static void FormatShouldNotBeSupported(MagickFormat format, IMagickFormatInfo? formatInfo)
+            => Assert.True(formatInfo is null, $"Format {format} should not be supported.");
+
+        private static void FormatShouldBeSupported(MagickFormat format, IMagickFormatInfo? formatInfo)
+            => Assert.True(formatInfo is not null, $"Format {format} should be supported.");
     }
 }
