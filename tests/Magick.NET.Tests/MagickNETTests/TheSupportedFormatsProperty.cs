@@ -40,7 +40,7 @@ public partial class MagickNETTests
         {
             var readableFormats = MagickNET.SupportedFormats
                 .Where(format => format.SupportsReading)
-                .Select(f => f.Format)
+                .Select(format => format.Format)
                 .ToList();
 
             List<MagickFormat> expectedFormats = [
@@ -112,7 +112,6 @@ public partial class MagickNETTests
                 MagickFormat.Fl32,
                 MagickFormat.Flv,
                 MagickFormat.Fractal,
-                MagickFormat.Ftp,
                 MagickFormat.Fts,
                 MagickFormat.Ftxt,
                 MagickFormat.G,
@@ -303,7 +302,7 @@ public partial class MagickNETTests
             ];
 
             if (Runtime.IsWindows)
-                expectedFormats.AddRange([MagickFormat.Clipboard, MagickFormat.Emf, MagickFormat.Wmf]);
+                expectedFormats.AddRange([MagickFormat.Clipboard, MagickFormat.Emf, MagickFormat.Ftp, MagickFormat.Wmf]);
 
             var extraFormats = readableFormats.Except(expectedFormats);
             Assert.False(extraFormats.Any(), "Extra formats detected in readable formats: " + string.Join(", ", extraFormats.Select(f => f.ToString())));
@@ -317,7 +316,7 @@ public partial class MagickNETTests
         {
             var writableFormats = MagickNET.SupportedFormats
                 .Where(format => format.SupportsWriting)
-                .Select(f => f.Format)
+                .Select(format => format.Format)
                 .ToList();
 
             List<MagickFormat> expectedFormats = [
