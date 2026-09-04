@@ -1407,4 +1407,29 @@ public enum MagickFormat
     /// Simple File Format Family Images.
     /// </summary>
     Sf3,
+
+    /// <summary>
+    /// Aseprite Sprite Format.
+    /// </summary>
+    Ase,
+
+    /// <summary>
+    /// Aseprite Sprite Format.
+    /// </summary>
+    Aseprite,
+
+    /// <summary>
+    /// C2PA Provenance Metadata.
+    /// </summary>
+    C2pa,
+
+    /// <summary>
+    /// Morphology Kernel.
+    /// </summary>
+    Kernel,
+
+    /// <summary>
+    /// Amiga Workbench Icon.
+    /// </summary>
+    Wbinfo,
 }
