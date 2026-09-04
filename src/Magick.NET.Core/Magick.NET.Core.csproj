@@ -2,9 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;netstandard20</TargetFrameworks>
     <Platforms>AnyCPU</Platforms>
-    <AssemblyVersion>14.16.0</AssemblyVersion>
-    <FileVersion>14.16.0</FileVersion>
-    <Version>14.16.0</Version>
+    <AssemblyVersion>14.17.0</AssemblyVersion>
+    <FileVersion>14.17.0</FileVersion>
+    <Version>14.17.0</Version>
     <Configurations>Debug;Test;Release</Configurations>
   </PropertyGroup>
 
