@@ -620,7 +620,7 @@ internal class NativeInteropGenerator : IIncrementalGenerator
             if (parameter.Type.IsChannel)
                 codeBuilder.Append("(NativeChannelsType)");
             else if (parameter.Type.IsEnum)
-                codeBuilder.Append("(IntPtr)");
+                codeBuilder.Append("(nint)");
 
             codeBuilder.Append(parameter.Name);
             if (parameter.Type.HasCreateInstance)
