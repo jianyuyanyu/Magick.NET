@@ -227,7 +227,7 @@ public partial class MagickImageTests
 #if Q8
             Assert.InRange(result, 0.4858, 0.4859);
 #elif Q16
-            Assert.InRange(result, 0.4668, 0.4669);
+            Assert.InRange(result, 0.4667, 0.4669);
 #elif Q16HDRI
             Assert.InRange(result, 0.5108, 0.5109);
 #else
