@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ImageMagick;
+using ImageMagick.Formats;
 using Xunit;
 using Xunit.Sdk;
 
@@ -56,6 +58,36 @@ public partial class MagickNETTests
                 Assert.Equal(195, formatsCount);
             else
                 Assert.Equal(194, formatsCount);
+        }
+
+        [Fact]
+        public void ShouldContainMostFormats()
+        {
+            var missingFormats = new List<MagickFormat>();
+            foreach (var format in Enum.GetValues(typeof(MagickFormat)).OfType<MagickFormat>())
+            {
+                if (format == MagickFormat.Unknown)
+                    continue;
+
+                var formatInfo = MagickNET.SupportedFormats
+                    .SingleOrDefault(f => f.Format == format);
+
+                switch (format)
+                {
+                    case MagickFormat.Sun:
+                    case MagickFormat.Ras:
+                        if (formatInfo is not null)
+                            Assert.Fail($"Format {format} should not be supported.");
+                        break;
+                    default:
+                        if (formatInfo is null)
+                            missingFormats.Add(format);
+                        break;
+                }
+            }
+
+            if (missingFormats.Count > 0)
+                Assert.Fail($"Missing formats: {string.Join(", ", missingFormats)}");
         }
 
         [Fact]
