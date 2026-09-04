@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using System.Linq;
 using ImageMagick;
 using Xunit;
@@ -42,7 +43,7 @@ public partial class ExifProfileTests
         [Fact]
         public void ShouldStoreRationalCorrectly()
         {
-            var exposureTime = 1.0 / 1600;
+            var exposureTime = Math.PI;
 
             using var image = new MagickImage(Files.FujiFilmFinePixS1ProJPG);
             var value = SetValueAndReturnValueFromNewImage(image, ExifTag.ExposureTime, new Rational(exposureTime));

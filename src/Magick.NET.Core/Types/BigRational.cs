@@ -62,21 +62,41 @@ internal struct BigRational : IEquatable<BigRational>
         Denominator = 1;
 
         var val = Math.Abs(value);
-        var df = 1.0;
         var epsilon = bestPrecision ? double.Epsilon : .000001;
 
-        while (Math.Abs(df - val) > epsilon)
-        {
-            if (df < val)
-                Numerator++;
-            else
-            {
-                Denominator++;
-                Numerator = (int)(val * Denominator);
-            }
+        var num = 1L;
+        var prevNum = 0L;
+        var den = 0L;
+        var prevDen = 1L;
+        var remainder = val;
 
-            df = Numerator / (double)Denominator;
+        for (var i = 0; i < 128; i++)
+        {
+            var term = Math.Floor(remainder);
+
+            if (!TryAccumulate(term, num, prevNum, out var newNum) ||
+                !TryAccumulate(term, den, prevDen, out var newDen) ||
+                newDen == 0)
+                break;
+
+            prevNum = num;
+            num = newNum;
+            prevDen = den;
+            den = newDen;
+
+            var approximation = num / (double)den;
+            if (Math.Abs(approximation - val) <= epsilon)
+                break;
+
+            var fraction = remainder - term;
+            if (fraction <= 0.0)
+                break;
+
+            remainder = 1.0 / fraction;
         }
+
+        Numerator = num;
+        Denominator = den == 0 ? 1 : den;
 
         if (value < 0.0)
             Numerator *= -1;
@@ -186,6 +206,21 @@ internal struct BigRational : IEquatable<BigRational>
 
     private static long GreatestCommonDivisor(long a, long b)
         => b == 0 ? a : GreatestCommonDivisor(b, a % b);
+
+    private static bool TryAccumulate(double term, long previous, long beforePrevious, out long result)
+    {
+        result = 0;
+
+        if (term > long.MaxValue)
+            return false;
+
+        var accumulated = (term * previous) + beforePrevious;
+        if (Math.Abs(accumulated) > long.MaxValue)
+            return false;
+
+        result = (long)accumulated;
+        return true;
+    }
 
     private void Simplify()
     {

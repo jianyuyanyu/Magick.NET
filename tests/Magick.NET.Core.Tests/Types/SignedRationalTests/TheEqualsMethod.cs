@@ -1,6 +1,7 @@
 ﻿// Copyright Dirk Lemstra https://github.com/dlemstra/Magick.NET.
 // Licensed under the Apache License, Version 2.0.
 
+using System;
 using ImageMagick;
 using Xunit;
 
@@ -73,8 +74,8 @@ public partial class SignedRationalTests
         [Fact]
         public void ShouldHandleFractionCorrectly()
         {
-            var first = new SignedRational(-1.0 / 1600);
-            var second = new SignedRational(-1.0 / 1600, true);
+            var first = new SignedRational(-Math.PI);
+            var second = new SignedRational(-Math.PI, true);
 
             Assert.False(first.Equals(second));
         }

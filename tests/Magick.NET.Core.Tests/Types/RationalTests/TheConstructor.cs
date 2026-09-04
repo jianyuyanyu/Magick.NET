@@ -72,5 +72,14 @@ public partial class RationalTests
             Assert.Equal(uint.MaxValue, rational.Numerator);
             Assert.Equal(1U, rational.Denominator);
         }
+
+        [Fact]
+        public void ShouldCompleteQuicklyForAVerySmallValueWithBestPrecision()
+        {
+            var rational = new Rational(1e-10, true);
+
+            Assert.Equal(1U, rational.Numerator);
+            Assert.Equal(1410065408U, rational.Denominator);
+        }
     }
 }

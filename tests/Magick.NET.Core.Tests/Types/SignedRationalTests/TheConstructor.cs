@@ -72,5 +72,14 @@ public partial class SignedRationalTests
             Assert.Equal(-1, rational.Numerator);
             Assert.Equal(1, rational.Denominator);
         }
+
+        [Fact]
+        public void ShouldCompleteQuicklyForAVerySmallValueWithBestPrecision()
+        {
+            var rational = new SignedRational(-1e-10, true);
+
+            Assert.Equal(-1, rational.Numerator);
+            Assert.Equal(1410065408, rational.Denominator);
+        }
     }
 }
