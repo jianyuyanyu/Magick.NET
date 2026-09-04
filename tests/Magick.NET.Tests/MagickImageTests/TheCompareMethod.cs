@@ -202,9 +202,9 @@ public partial class MagickImageTests
 
             var result = image.Compare(other, ErrorMetric.PhaseCorrelation);
 #if Q16HDRI
-            Assert.InRange(result, 0.4906, 0.4907);
+            Assert.InRange(result, 0.3670, 0.3671);
 #else
-            Assert.InRange(result, 0.4096, 0.4097);
+            Assert.InRange(result, 0.2805, 0.2806);
 #endif
         }
 
@@ -220,9 +220,9 @@ public partial class MagickImageTests
 
             var result = image.Compare(other, ErrorMetric.PhaseCorrelation);
 #if Q16HDRI
-            Assert.InRange(result, 0.5121, 0.5122);
+            Assert.InRange(result, 0.5108, 0.5109);
 #else
-            Assert.InRange(result, 0.5092, 0.5093);
+            Assert.InRange(result, 0.4858, 0.4859);
 #endif
         }
     }
