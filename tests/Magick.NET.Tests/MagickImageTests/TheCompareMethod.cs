@@ -201,10 +201,14 @@ public partial class MagickImageTests
             using var other = image.CloneAndMutate(image => image.Rotate(180));
 
             var result = image.Compare(other, ErrorMetric.PhaseCorrelation);
-#if Q16HDRI
+#if Q8
+            Assert.InRange(result, 0.2805, 0.2806);
+#elif Q16
+            Assert.InRange(result, 0.2862, 0.2863);
+#elif Q16HDRI
             Assert.InRange(result, 0.3670, 0.3671);
 #else
-            Assert.InRange(result, 0.2805, 0.2806);
+#error Not implemented!
 #endif
         }
 
@@ -219,10 +223,15 @@ public partial class MagickImageTests
             using var other = image.CloneAndMutate(image => image.Rotate(180));
 
             var result = image.Compare(other, ErrorMetric.PhaseCorrelation);
-#if Q16HDRI
+
+#if Q8
+            Assert.InRange(result, 0.4858, 0.4859);
+#elif Q16
+            Assert.InRange(result, 0.4668, 0.4669);
+#elif Q16HDRI
             Assert.InRange(result, 0.5108, 0.5109);
 #else
-            Assert.InRange(result, 0.4858, 0.4859);
+#error Not implemented!
 #endif
         }
     }
