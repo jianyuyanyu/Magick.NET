@@ -17,7 +17,7 @@ internal class AsyncStreamWrapper : StreamWrapperBase
     private readonly SemaphoreSlim _writeDone = new(0, 1);
     private int _readCount = 0;
     private int _writeCount = 0;
-    private bool _exceptionThrown;
+    private volatile bool _exceptionThrown;
 
     public AsyncStreamWrapper(Stream stream)
         : base(stream)
@@ -56,6 +56,7 @@ internal class AsyncStreamWrapper : StreamWrapperBase
                 finally
                 {
                     _readCount = -1;
+                    _performRead.Wait(0);
                     _performRead.Release();
                 }
             },
@@ -87,8 +88,10 @@ internal class AsyncStreamWrapper : StreamWrapperBase
                 finally
                 {
                     _readCount = -1;
+                    _performRead.Wait(0);
                     _performRead.Release();
                     _writeCount = -1;
+                    _performWrite.Wait(0);
                     _performWrite.Release();
                 }
             },
@@ -111,6 +114,10 @@ internal class AsyncStreamWrapper : StreamWrapperBase
 
         _readCount = count;
         _performRead.Release();
+
+        if (_exceptionThrown)
+            return -1;
+
         _readDone.Wait();
 
         if (_exceptionThrown)
@@ -132,6 +139,10 @@ internal class AsyncStreamWrapper : StreamWrapperBase
 
         _writeCount = count;
         _performWrite.Release();
+
+        if (_exceptionThrown)
+            return false;
+
         _writeDone.Wait();
 
         if (_exceptionThrown)
