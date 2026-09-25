@@ -36,12 +36,12 @@ public class TheJpegXlCoder
         memStream.Position = 0;
 
         using var output = new MagickImage(memStream);
-        var outputXmpProfile = input.GetXmpProfile();
+        var outputXmpProfile = output.GetXmpProfile();
 
         Assert.NotNull(outputXmpProfile);
         Assert.Equal(inputXmpProfile.ToByteArray(), outputXmpProfile.ToByteArray());
 
-        var outputExifProfile = input.GetExifProfile();
+        var outputExifProfile = output.GetExifProfile();
 
         Assert.NotNull(outputExifProfile);
         Assert.Equal(inputExifProfile.ToByteArray(), outputExifProfile.ToByteArray());
