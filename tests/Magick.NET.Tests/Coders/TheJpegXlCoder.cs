@@ -35,6 +35,12 @@ public class TheJpegXlCoder
         input.Write(memStream, MagickFormat.Jxl);
         memStream.Position = 0;
 
+        inputXmpProfile = input.GetXmpProfile();
+        Assert.NotNull(inputXmpProfile);
+
+        inputExifProfile = input.GetExifProfile();
+        Assert.NotNull(inputExifProfile);
+
         using var output = new MagickImage(memStream);
         var outputXmpProfile = output.GetXmpProfile();
 
